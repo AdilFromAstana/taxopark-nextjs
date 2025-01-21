@@ -18,7 +18,7 @@ const AdminLayout = ({ children }: { children: React.ReactNode }) => {
   ];
 
   return (
-    <div className="flex">
+    <div className="flex h-full">
       {/* Sidebar */}
       <aside
         className={`bg-gray-800 text-white transition-all duration-300 w-64`}
@@ -33,11 +33,10 @@ const AdminLayout = ({ children }: { children: React.ReactNode }) => {
               key={index}
               href={item.link}
               passHref
-              className={`block py-2 px-4 transition-all truncate ${
-                pathname === item.link
+              className={`block py-2 px-4 transition-all truncate ${pathname === item.link
                   ? "bg-gray-700 font-bold"
                   : "hover:bg-gray-700"
-              }`}
+                }`}
               title={item.label}
             >
               {item.label}
