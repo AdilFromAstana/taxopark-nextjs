@@ -1,6 +1,5 @@
 import { Viewport } from "next";
-import TaxiFormTable from "../components/Forms/Forms";
-import { Park } from "../interfaces/interfaces";
+import FormTable from "../components/Forms/Forms";
 
 export const viewport: Viewport = {
   width: "device-width",
@@ -8,6 +7,5 @@ export const viewport: Viewport = {
 };
 
 export default async function FormsPage() {
-  const data = await fetchForms(); // Загрузка данных
-  return <TaxiFormTable data={data} />;
+  return <FormTable />;
 }

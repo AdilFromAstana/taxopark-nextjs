@@ -133,7 +133,7 @@ const FormTable = () => {
 
         if (typeof aValue === "object" && typeof bValue === "object") {
           const aValue = a.Park?.title || "";
-          const bValue = a.Pak?.title || "";
+          const bValue = a.Park?.title || "";
           return sortConfig.order === "asc"
             ? aValue.localeCompare(bValue)
             : bValue.localeCompare(aValue);
@@ -164,10 +164,10 @@ const FormTable = () => {
             <th className="border border-gray-300 px-4 py-2">
               <div
                 className="flex justify-center items-center cursor-pointer"
-                onClick={() => handleSort("title")}
+                onClick={() => handleSort("name")}
               >
                 Название
-                {sortConfig.key === "title" && sortConfig.order ? (
+                {sortConfig.key === "name" && sortConfig.order ? (
                   sortConfig.order === "asc" ? (
                     <GoSortAsc fontSize="20px" />
                   ) : (
@@ -181,10 +181,10 @@ const FormTable = () => {
             <th className="border border-gray-300 px-4 py-2">
               <div
                 className="flex justify-center items-center cursor-pointer"
-                onClick={() => handleSort("City")}
+                onClick={() => handleSort("Park")}
               >
                 Город
-                {sortConfig.key === "City" && sortConfig.order ? (
+                {sortConfig.key === "Park" && sortConfig.order ? (
                   sortConfig.order === "asc" ? (
                     <GoSortAsc fontSize="20px" />
                   ) : (
@@ -198,10 +198,10 @@ const FormTable = () => {
             <th className="border border-gray-300 px-4 py-2">
               <div
                 className="flex justify-center items-center cursor-pointer"
-                onClick={() => handleSort("parkCommission")}
+                onClick={() => handleSort("phoneNumber")}
               >
                 Комиссия парка
-                {sortConfig.key === "parkCommission" && sortConfig.order ? (
+                {sortConfig.key === "phoneNumber" && sortConfig.order ? (
                   sortConfig.order === "asc" ? (
                     <GoSortAsc fontSize="20px" />
                   ) : (
@@ -219,39 +219,44 @@ const FormTable = () => {
           </tr>
         </thead>
         <tbody>
-          {parks
-            .filter((item) => !item.active)
-            .map((item, i) => (
-              <tr
-                key={item.id}
-                className="hover:bg-gray-50"
-                onClick={() => handleViewRecord(item)}
-              >
-                <td className="border border-gray-300 px-4 py-2 text-center">
-                  {i + 1}
-                </td>
-                <td className="border border-gray-300 px-4 py-2">
-                  {item.title}
-                </td>
-                <td className="border border-gray-300 px-4 py-2">
-                  {item.City ? item.City.title : "-"}
-                </td>
-                <td className="border border-gray-300 px-4 py-2">
-                  {item.parkCommission}%
-                </td>
-                <td className="border border-gray-300 px-4 py-2">
-                  {item.yandexGasStation ? "Да" : "Нет"}
-                </td>
-                <td className="border border-gray-300 px-4 py-2 text-center space-x-2">
-                  <button
-                    className="bg-red-500 text-white px-2 py-1 rounded hover:bg-red-600 transition duration-200"
-                    onClick={() => handleArchiveRecord(item.id)}
-                  >
-                    Архивировать
-                  </button>
-                </td>
-              </tr>
-            ))}
+          {parks.map((item, i) => (
+            <tr
+              key={item.id}
+              className="hover:bg-gray-50"
+              onClick={() => handleViewRecord(item)}
+            >
+              <td className="border border-gray-300 px-4 py-2 text-center">
+                {i + 1}
+              </td>
+              <td className="border border-gray-300 px-4 py-2">{item.name}</td>
+              <td className="border border-gray-300 px-4 py-2">
+                {item.Park ? item.Park.title : "-"}
+              </td>
+              <td className="border border-gray-300 px-4 py-2">
+                {item.phoneNumber}
+              </td>
+              <td className="border border-gray-300 px-4 py-2">
+                {item.createdAt
+                  ? new Date(item.createdAt).toLocaleString("ru-RU", {
+                      year: "numeric",
+                      month: "long",
+                      day: "numeric",
+                      hour: "2-digit",
+                      minute: "2-digit",
+                      second: "2-digit",
+                    })
+                  : "Нет данных"}
+              </td>
+              <td className="border border-gray-300 px-4 py-2 text-center space-x-2">
+                <button
+                  className="bg-red-500 text-white px-2 py-1 rounded hover:bg-red-600 transition duration-200"
+                  onClick={() => handleArchiveRecord(item.id)}
+                >
+                  Архивировать
+                </button>
+              </td>
+            </tr>
+          ))}
         </tbody>
       </table>
 
