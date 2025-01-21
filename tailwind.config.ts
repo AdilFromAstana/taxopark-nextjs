@@ -12,6 +12,9 @@ export default {
         background: "var(--background)",
         foreground: "var(--foreground)",
       },
+      rotate: {
+        "y-180": "rotateY(180deg)",
+      },
     },
   },
   plugins: [],
