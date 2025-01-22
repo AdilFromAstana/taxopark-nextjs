@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import React, { memo, useEffect, useState } from "react";
 import CreatePark from "./component/CreatePark";
 import UpdatePark from "./component/UpdatePark";
 import { Park } from "@/app/interfaces/interfaces";
@@ -12,13 +12,16 @@ import axios from "axios";
 type SortOrder = "asc" | "desc" | null;
 
 interface TaxiParkTableProps {
+  cities: any[];
+}
+interface GetParks {
   parks: Park[];
   total: number;
   page: number;
   totalPages: number;
 }
 
-const TaxiParkTable = () => {
+const TaxiParkTable: React.FC<TaxiParkTableProps> = memo(({ cities }) => {
   const [isCreateModalOpen, setIsCreateModalOpen] = useState<boolean>(false);
   const [selectedRecord, setSelectedRecord] = useState<Park | null>(null);
   const [totalRecords, setTotalRecords] = useState<number>(0);
@@ -47,12 +50,15 @@ const TaxiParkTable = () => {
     if (selectedRecord) {
       try {
         setIsLoading(true);
-        const response = await axios.put(`/api/parks/${selectedRecord.id}`, updatedData);
+        const response = await axios.put(
+          `http://localhost:5000/api/parks/${selectedRecord.id}`,
+          selectedRecord
+        );
         const updatedPark = response.data;
 
         setParks((prevParks) =>
           prevParks.map((park) =>
-            park.id === id ? { ...park, ...updatedPark } : park
+            park.id === selectedRecord.id ? { ...park, ...updatedPark } : park
           )
         );
 
@@ -67,6 +73,25 @@ const TaxiParkTable = () => {
     }
   };
 
+  const createPark = async () => {
+    try {
+      setIsLoading(true);
+      const response = await axios.post(
+        "http://localhost:5000/api/parks",
+        newRecord
+      );
+      const createdPark = response.data;
+
+      setParks((prevParks) => [...prevParks, createdPark]);
+      setIsCreateModalOpen(false);
+    } catch (error) {
+      console.error("Ошибка при создании парка:", error);
+      alert("Не удалось создать парк. Попробуйте снова.");
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   const handleSort = (key: keyof Park) => {
     setSortConfig((prevConfig) => {
       const newOrder: SortOrder =
@@ -74,25 +99,12 @@ const TaxiParkTable = () => {
           ? prevConfig.order === "asc"
             ? "desc"
             : prevConfig.order === "desc"
-              ? null
-              : "asc"
+            ? null
+            : "asc"
           : "asc";
 
       return { key, order: newOrder };
     });
-  };
-
-  const handleEditRecord = () => {
-    if (selectedRecord) {
-      setParks((prevData) =>
-        prevData.map((item) =>
-          item.id === selectedRecord.id ? selectedRecord : item
-        )
-      );
-    }
-    setIsViewEditModalOpen(false);
-    setIsEditMode(false);
-    setSelectedRecord(null);
   };
 
   const handleViewRecord = (record: Park) => {
@@ -109,12 +121,12 @@ const TaxiParkTable = () => {
     );
   };
 
-  const fetchData = async (page: number, limit: number) => {
+  const fetchData = async () => {
     try {
       const response = await fetch(
-        `http://localhost:5000/api/parks?page=${page}&limit=${limit}`
+        `http://localhost:5000/api/parks?page=${currentPage}&limit=${limit}&sortField=${sortConfig.key}&sortOrder=${sortConfig.order}`
       );
-      const result: TaxiParkTableProps = await response.json();
+      const result: GetParks = await response.json();
       console.log(result);
       setParks(result.parks);
       setTotalRecords(result.totalPages);
@@ -123,67 +135,23 @@ const TaxiParkTable = () => {
     }
   };
 
-  const handleAddRecord = (e) => console.log(e)
+  const handleAddRecord = (e) => console.log(e);
 
   useEffect(() => {
-    fetchData(currentPage, limit);
-  }, [currentPage, limit]);
-
-  useEffect(() => {
-    if (sortConfig.key && sortConfig.order) {
-      const sortedParks = [...parks].sort((a, b) => {
-        let aValue, bValue;
-
-        if (sortConfig.key === "City") {
-          aValue = a.City?.title || "";
-          bValue = b.City?.title || "";
-        } else {
-          aValue = a[sortConfig.key!];
-          bValue = b[sortConfig.key!];
-        }
-
-        if (typeof aValue === "string" && typeof bValue === "string") {
-          return sortConfig.order === "asc"
-            ? aValue.localeCompare(bValue)
-            : bValue.localeCompare(aValue);
-        }
-
-        if (typeof aValue === "number" && typeof bValue === "number") {
-          const aDigits = aValue.toString().length;
-          const bDigits = bValue.toString().length;
-          if (aDigits !== bDigits) {
-            return sortConfig.order === "asc"
-              ? aDigits - bDigits
-              : bDigits - aDigits;
-          }
-          return sortConfig.order === "asc" ? aValue - bValue : bValue - aValue;
-        }
-
-        if (typeof aValue === "object" && typeof bValue === "object") {
-          const aValue = a.City?.title || "";
-          const bValue = a.City?.title || "";
-          return sortConfig.order === "asc"
-            ? aValue.localeCompare(bValue)
-            : bValue.localeCompare(aValue);
-        }
-
-        return 0;
-      });
-
-      setParks(sortedParks);
-    }
-  }, [sortConfig]);
+    fetchData();
+  }, [currentPage, limit, sortConfig]);
 
   return (
     <div className="p-4 h-full flex flex-col gap-4">
-      <h1 className="text-2xl font-bold">Таксопарки</h1>
-
-      <button
-        className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 transition duration-200"
-        onClick={() => setIsCreateModalOpen(true)}
-      >
-        Добавить таксопарк
-      </button>
+      <div className="flex justify-between items-center">
+        <h1 className="text-2xl font-bold">Таксопарки</h1>
+        <button
+          className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 transition duration-200"
+          onClick={() => setIsCreateModalOpen(true)}
+        >
+          Добавить таксопарк
+        </button>
+      </div>
 
       <div className="overflow-auto">
         <table className="w-full border-collapse border border-gray-300 text-sm">
@@ -248,39 +216,37 @@ const TaxiParkTable = () => {
             </tr>
           </thead>
           <tbody>
-            {parks
-              .filter((item) => !item.active)
-              .map((item, i) => (
-                <tr
-                  key={item.id}
-                  className="hover:bg-gray-50"
-                  onClick={() => handleViewRecord(item)}
-                >
-                  <td className="border border-gray-300 px-4 py-2 text-center">
-                    {i + 1}
-                  </td>
-                  <td className="border border-gray-300 px-4 py-2">
-                    {item.title}
-                  </td>
-                  <td className="border border-gray-300 px-4 py-2">
-                    {item.City ? item.City.title : "-"}
-                  </td>
-                  <td className="border border-gray-300 px-4 py-2">
-                    {item.parkCommission}%
-                  </td>
-                  <td className="border border-gray-300 px-4 py-2">
-                    {item.yandexGasStation ? "Да" : "Нет"}
-                  </td>
-                  <td className="border border-gray-300 px-4 py-2 text-center space-x-2">
-                    <button
-                      className="bg-red-500 text-white px-2 py-1 rounded hover:bg-red-600 transition duration-200"
-                      onClick={() => handleArchiveRecord(item.id)}
-                    >
-                      Архивировать
-                    </button>
-                  </td>
-                </tr>
-              ))}
+            {parks.map((item, i) => (
+              <tr
+                key={item.id}
+                className="hover:bg-gray-50"
+                onClick={() => handleViewRecord(item)}
+              >
+                <td className="border border-gray-300 px-4 py-2 text-center">
+                  {(currentPage - 1) * limit + i + 1}
+                </td>
+                <td className="border border-gray-300 px-4 py-2">
+                  {item.title}
+                </td>
+                <td className="border border-gray-300 px-4 py-2">
+                  {item.City ? item.City.title : "-"}
+                </td>
+                <td className="border border-gray-300 px-4 py-2">
+                  {item.parkCommission}%
+                </td>
+                <td className="border border-gray-300 px-4 py-2">
+                  {item.yandexGasStation ? "Да" : "Нет"}
+                </td>
+                <td className="border border-gray-300 px-4 py-2 text-center space-x-2">
+                  <button
+                    className="bg-red-500 text-white px-2 py-1 rounded hover:bg-red-600 transition duration-200"
+                    onClick={() => handleArchiveRecord(item.id)}
+                  >
+                    Архивировать
+                  </button>
+                </td>
+              </tr>
+            ))}
           </tbody>
         </table>
       </div>
@@ -328,23 +294,27 @@ const TaxiParkTable = () => {
           newRecord={newRecord}
           setNewRecord={setNewRecord}
           setIsCreateModalOpen={setIsCreateModalOpen}
-          handleAddRecord={handleAddRecord}
+          createPark={createPark}
+          cities={cities}
         />
       )}
 
       {isViewEditModalOpen && selectedRecord && (
         <UpdatePark
+          cities={cities}
           setIsViewEditModalOpen={setIsViewEditModalOpen}
           isEditMode={isEditMode}
           setIsEditMode={setIsEditMode}
           selectedRecord={selectedRecord}
           setSelectedRecord={setSelectedRecord}
           parks={parks}
-          handleEditRecord={handleEditRecord}
+          updatePark={updatePark}
         />
       )}
     </div>
   );
-};
+});
+
+TaxiParkTable.displayName = "TaxiParkTable";
 
 export default TaxiParkTable;

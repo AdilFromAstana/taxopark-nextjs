@@ -11,13 +11,10 @@ import UpdateForm from "./components/UpdateForm";
 type SortOrder = "asc" | "desc" | null;
 
 interface FormTableProps {
-  forms: Form[];
-  total: number;
-  page: number;
-  totalPages: number;
+  cities: any[];
 }
 
-const FormTable = () => {
+const FormTable: React.FC<FormTableProps> = ({ cities }) => {
   const [isCreateModalOpen, setIsCreateModalOpen] = useState<boolean>(false);
   const [selectedRecord, setSelectedRecord] = useState<Form | null>(null);
   const [totalRecords, setTotalRecords] = useState<number>(0);
@@ -48,8 +45,8 @@ const FormTable = () => {
           ? prevConfig.order === "asc"
             ? "desc"
             : prevConfig.order === "desc"
-              ? null
-              : "asc"
+            ? null
+            : "asc"
           : "asc";
 
       return { key, order: newOrder };
@@ -229,7 +226,9 @@ const FormTable = () => {
                 <td className="border border-gray-300 px-4 py-2 text-center">
                   {i + 1}
                 </td>
-                <td className="border border-gray-300 px-4 py-2">{item.name}</td>
+                <td className="border border-gray-300 px-4 py-2">
+                  {item.name}
+                </td>
                 <td className="border border-gray-300 px-4 py-2">
                   {item.Park ? item.Park.title : "-"}
                 </td>
@@ -239,13 +238,13 @@ const FormTable = () => {
                 <td className="border border-gray-300 px-4 py-2">
                   {item.createdAt
                     ? new Date(item.createdAt).toLocaleString("ru-RU", {
-                      year: "numeric",
-                      month: "long",
-                      day: "numeric",
-                      hour: "2-digit",
-                      minute: "2-digit",
-                      second: "2-digit",
-                    })
+                        year: "numeric",
+                        month: "long",
+                        day: "numeric",
+                        hour: "2-digit",
+                        minute: "2-digit",
+                        second: "2-digit",
+                      })
                     : "Нет данных"}
                 </td>
                 <td className="border border-gray-300 px-4 py-2 text-center space-x-2">

@@ -7,14 +7,16 @@ interface CreateParkProps {
     React.SetStateAction<Omit<Park, "id" | "active" | "City">>
   >;
   setIsCreateModalOpen: React.Dispatch<React.SetStateAction<boolean>>;
-  handleAddRecord: () => void;
+  createPark: () => void;
+  cities: any[];
 }
 
 const CreatePark: React.FC<CreateParkProps> = ({
   newRecord,
   setNewRecord,
   setIsCreateModalOpen,
-  handleAddRecord,
+  createPark,
+  cities,
 }) => {
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
@@ -34,17 +36,30 @@ const CreatePark: React.FC<CreateParkProps> = ({
           </div>
           <div>
             <label className="block text-sm font-medium mb-1">Город</label>
-            <input
-              type="text"
+            <select
               className="w-full border border-gray-300 rounded-lg p-2"
               value={newRecord.cityId}
               onChange={(e) =>
-                setNewRecord({ ...newRecord, cityId: e.target.value })
+                setNewRecord({
+                  ...newRecord,
+                  cityId: e.target.value,
+                })
               }
-            />
+            >
+              <option value="" disabled>
+                Выберите город
+              </option>
+              {cities.map((city) => (
+                <option key={city.id} value={city.id}>
+                  {city.title}
+                </option>
+              ))}
+            </select>
           </div>
           <div>
-            <label className="block text-sm font-medium mb-1">Комиссия</label>
+            <label className="block text-sm font-medium mb-1">
+              Комиссия парка, %
+            </label>
             <input
               type="text"
               className="w-full border border-gray-300 rounded-lg p-2"
@@ -74,7 +89,7 @@ const CreatePark: React.FC<CreateParkProps> = ({
           <div className="flex justify-between space-x-2">
             <button
               className="bg-green-400 text-white px-4 py-2 rounded hover:bg-green-500 transition duration-200"
-              onClick={handleAddRecord}
+              onClick={createPark}
             >
               Сохранить
             </button>
