@@ -73,25 +73,6 @@ const TaxiParkTable: React.FC<TaxiParkTableProps> = memo(({ cities }) => {
     }
   };
 
-  const createPark = async () => {
-    try {
-      setIsLoading(true);
-      const response = await axios.post(
-        "http://localhost:5000/api/parks",
-        newRecord
-      );
-      const createdPark = response.data;
-
-      setParks((prevParks) => [...prevParks, createdPark]);
-      setIsCreateModalOpen(false);
-    } catch (error) {
-      console.error("Ошибка при создании парка:", error);
-      alert("Не удалось создать парк. Попробуйте снова.");
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
   const handleSort = (key: keyof Park) => {
     setSortConfig((prevConfig) => {
       const newOrder: SortOrder =
@@ -291,10 +272,8 @@ const TaxiParkTable: React.FC<TaxiParkTableProps> = memo(({ cities }) => {
 
       {isCreateModalOpen && (
         <CreatePark
-          newRecord={newRecord}
-          setNewRecord={setNewRecord}
+          setParks={setParks}
           setIsCreateModalOpen={setIsCreateModalOpen}
-          createPark={createPark}
           cities={cities}
         />
       )}

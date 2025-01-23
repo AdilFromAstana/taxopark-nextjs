@@ -1,10 +1,10 @@
 export interface Park {
   id: string; // Уникальный идентификатор таксопарка
-  parkEntrepreneurSupport?: number | null; // Поддержка паркового ИП (в процентах или числовое значение)
-  entrepreneurSupport?: number | null; // Поддержка ИП водителей
+  parkEntrepreneurSupport?: boolean | null; // Поддержка паркового ИП (в процентах или числовое значение)
+  entrepreneurSupport?: boolean | null; // Поддержка ИП водителей
   commissionWithdraw?: number | null; // Комиссия за снятие средств
-  paymentsByTransfer?: boolean | null; // Выплаты переводом
-  accountantSupport?: number | null; // Уровень поддержки бухгалтерии
+  paymentsByTransfer?: number | null; // Выплаты переводом
+  accountantSupport?: boolean | null; // Уровень поддержки бухгалтерии
   yandexGasStation?: boolean | null; // Наличие поддержки Яндекс заправки
   supportWorkTime?: string | null; // Время работы техподдержки
   parkCommission?: number | null; // Комиссия парка в процентах
