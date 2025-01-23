@@ -1,23 +1,24 @@
 export interface Park {
-  id: string; // Уникальный идентификатор таксопарка
-  parkEntrepreneurSupport?: boolean | null; // Поддержка паркового ИП (в процентах или числовое значение)
-  entrepreneurSupport?: boolean | null; // Поддержка ИП водителей
-  commissionWithdraw?: number | null; // Комиссия за снятие средств
-  paymentsByTransfer?: number | null; // Выплаты переводом
-  accountantSupport?: boolean | null; // Уровень поддержки бухгалтерии
-  yandexGasStation?: boolean | null; // Наличие поддержки Яндекс заправки
-  supportWorkTime?: string | null; // Время работы техподдержки
-  parkCommission?: number | null; // Комиссия парка в процентах
-  parkPromotions?: number[] | null; // Акции парка (массив чисел)
-  paymentType?: number | null; // Тип оплаты (например, 0 = наличные, 1 = карта)
-  active?: boolean | null; // Статус активности парка
-  rating?: number | null; // Рейтинг таксопарка (может быть с дробной частью)
-  cityId: string; // Идентификатор города
-  title: string; // Название таксопарка
+  id: string;
+  parkEntrepreneurSupport?: boolean | null;
+  entrepreneurSupport?: boolean | null;
+  commissionWithdraw?: number | null;
+  transferPaymentCommission?: number | null;
+  accountantSupport?: boolean | null;
+  yandexGasStation?: boolean | null;
+  supportWorkTime?: string | null;
+  parkCommission?: number | null;
+  parkPromotions?: number[] | null;
+  paymentType?: number | null;
+  active: boolean;
+  
+  rating?: number | null;
+  cityId: string;
+  title: string;
   City: {
-    id: string; // Идентификатор города
-    title: string; // Название города
-  }; // Идентификатор города
+    id: string;
+    title: string;
+  };
 }
 
 export interface Form {

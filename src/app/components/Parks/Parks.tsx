@@ -8,12 +8,20 @@ import { Park } from "@/app/interfaces/interfaces";
 import { BiSortAlt2 } from "react-icons/bi";
 import { GoSortAsc, GoSortDesc } from "react-icons/go";
 import axios from "axios";
+import NotificationBar from "../NotificationBar/NotificationBar";
 
 type SortOrder = "asc" | "desc" | null;
+
+interface Notification {
+  id: string;
+  type: "success" | "error";
+  message: string;
+}
 
 interface TaxiParkTableProps {
   cities: any[];
 }
+
 interface GetParks {
   parks: Park[];
   total: number;
@@ -22,6 +30,7 @@ interface GetParks {
 }
 
 const TaxiParkTable: React.FC<TaxiParkTableProps> = memo(({ cities }) => {
+  const [notifications, setNotifications] = useState<Notification[]>([]);
   const [isCreateModalOpen, setIsCreateModalOpen] = useState<boolean>(false);
   const [selectedRecord, setSelectedRecord] = useState<Park | null>(null);
   const [totalRecords, setTotalRecords] = useState<number>(0);
@@ -32,14 +41,6 @@ const TaxiParkTable: React.FC<TaxiParkTableProps> = memo(({ cities }) => {
   const [parks, setParks] = useState<Park[]>([]);
   const [isViewEditModalOpen, setIsViewEditModalOpen] =
     useState<boolean>(false);
-
-  const [newRecord, setNewRecord] = useState<
-    Omit<Park, "id" | "active" | "City">
-  >({
-    title: "",
-    cityId: "",
-    commissionWithdraw: 0,
-  });
 
   const [sortConfig, setSortConfig] = useState<{
     key: keyof Park | null;
@@ -80,8 +81,8 @@ const TaxiParkTable: React.FC<TaxiParkTableProps> = memo(({ cities }) => {
           ? prevConfig.order === "asc"
             ? "desc"
             : prevConfig.order === "desc"
-            ? null
-            : "asc"
+              ? null
+              : "asc"
           : "asc";
 
       return { key, order: newOrder };
@@ -115,8 +116,6 @@ const TaxiParkTable: React.FC<TaxiParkTableProps> = memo(({ cities }) => {
       console.error("Ошибка при загрузке данных: ", error);
     }
   };
-
-  const handleAddRecord = (e) => console.log(e);
 
   useEffect(() => {
     fetchData();
@@ -272,6 +271,8 @@ const TaxiParkTable: React.FC<TaxiParkTableProps> = memo(({ cities }) => {
 
       {isCreateModalOpen && (
         <CreatePark
+          setNotifications={setNotifications}
+          notifications={notifications}
           setParks={setParks}
           setIsCreateModalOpen={setIsCreateModalOpen}
           cities={cities}
@@ -290,6 +291,8 @@ const TaxiParkTable: React.FC<TaxiParkTableProps> = memo(({ cities }) => {
           updatePark={updatePark}
         />
       )}
+
+      <NotificationBar notifications={notifications} />
     </div>
   );
 });
