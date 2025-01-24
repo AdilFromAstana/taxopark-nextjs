@@ -9,7 +9,7 @@ import { Park } from "./interfaces/interfaces";
 
 async function fetchParks(): Promise<Park[]> {
   const response = await fetch("http://localhost:5000/api/parks", {
-    cache: "no-store", // Указывает, что данные не должны кэшироваться
+    cache: "no-store",
   });
 
   if (!response.ok) {

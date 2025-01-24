@@ -3,14 +3,11 @@
 import React, { memo, useEffect, useState } from "react";
 import CreatePark from "./component/CreatePark";
 import UpdatePark from "./component/UpdatePark";
-import { Park } from "@/app/interfaces/interfaces";
+import { GetParks, Park, SortOrder } from "@/app/interfaces/interfaces";
 // import { LuFilter } from "react-icons/lu";
 import { BiSortAlt2 } from "react-icons/bi";
 import { GoSortAsc, GoSortDesc } from "react-icons/go";
-import axios from "axios";
 import NotificationBar from "../NotificationBar/NotificationBar";
-
-type SortOrder = "asc" | "desc" | null;
 
 interface Notification {
   id: string;
@@ -22,13 +19,6 @@ interface TaxiParkTableProps {
   cities: any[];
 }
 
-interface GetParks {
-  parks: Park[];
-  total: number;
-  page: number;
-  totalPages: number;
-}
-
 const TaxiParkTable: React.FC<TaxiParkTableProps> = memo(({ cities }) => {
   const [notifications, setNotifications] = useState<Notification[]>([]);
   const [isCreateModalOpen, setIsCreateModalOpen] = useState<boolean>(false);
@@ -36,7 +26,7 @@ const TaxiParkTable: React.FC<TaxiParkTableProps> = memo(({ cities }) => {
   const [totalRecords, setTotalRecords] = useState<number>(0);
   const [currentPage, setCurrentPage] = useState<number>(1);
   const [limit, setLimit] = useState<number>(10);
-  const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [isLoading, setIsLoading] = useState<boolean>(true);
   const [isEditMode, setIsEditMode] = useState<boolean>(false);
   const [parks, setParks] = useState<Park[]>([]);
   const [isViewEditModalOpen, setIsViewEditModalOpen] =
@@ -47,33 +37,6 @@ const TaxiParkTable: React.FC<TaxiParkTableProps> = memo(({ cities }) => {
     order: SortOrder;
   }>({ key: null, order: null });
 
-  const updatePark = async () => {
-    if (selectedRecord) {
-      try {
-        setIsLoading(true);
-        const response = await axios.put(
-          `http://localhost:5000/api/parks/${selectedRecord.id}`,
-          selectedRecord
-        );
-        const updatedPark = response.data;
-
-        setParks((prevParks) =>
-          prevParks.map((park) =>
-            park.id === selectedRecord.id ? { ...park, ...updatedPark } : park
-          )
-        );
-
-        setIsViewEditModalOpen(false); // Закрываем модальное окно после обновления
-        setSelectedRecord(null); // Очищаем выбранную запись
-      } catch (error) {
-        console.error("Ошибка при обновлении парка:", error);
-        alert("Не удалось обновить парк. Попробуйте снова.");
-      } finally {
-        setIsLoading(false);
-      }
-    }
-  };
-
   const handleSort = (key: keyof Park) => {
     setSortConfig((prevConfig) => {
       const newOrder: SortOrder =
@@ -81,8 +44,8 @@ const TaxiParkTable: React.FC<TaxiParkTableProps> = memo(({ cities }) => {
           ? prevConfig.order === "asc"
             ? "desc"
             : prevConfig.order === "desc"
-              ? null
-              : "asc"
+            ? null
+            : "asc"
           : "asc";
 
       return { key, order: newOrder };
@@ -105,15 +68,17 @@ const TaxiParkTable: React.FC<TaxiParkTableProps> = memo(({ cities }) => {
 
   const fetchData = async () => {
     try {
+      setIsLoading(true);
       const response = await fetch(
         `http://localhost:5000/api/parks?page=${currentPage}&limit=${limit}&sortField=${sortConfig.key}&sortOrder=${sortConfig.order}`
       );
       const result: GetParks = await response.json();
-      console.log(result);
       setParks(result.parks);
       setTotalRecords(result.totalPages);
     } catch (error) {
       console.error("Ошибка при загрузке данных: ", error);
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -134,6 +99,11 @@ const TaxiParkTable: React.FC<TaxiParkTableProps> = memo(({ cities }) => {
       </div>
 
       <div className="overflow-auto">
+        {isLoading && (
+          <div className="absolute inset-0 bg-black bg-opacity-30 flex items-center justify-center z-50">
+            <div className="loader ease-linear rounded-full border-4 border-t-4 border-gray-200 h-12 w-12"></div>
+          </div>
+        )}
         <table className="w-full border-collapse border border-gray-300 text-sm">
           <thead className="bg-gray-100">
             <tr>
@@ -272,7 +242,6 @@ const TaxiParkTable: React.FC<TaxiParkTableProps> = memo(({ cities }) => {
       {isCreateModalOpen && (
         <CreatePark
           setNotifications={setNotifications}
-          notifications={notifications}
           setParks={setParks}
           setIsCreateModalOpen={setIsCreateModalOpen}
           cities={cities}
@@ -281,14 +250,15 @@ const TaxiParkTable: React.FC<TaxiParkTableProps> = memo(({ cities }) => {
 
       {isViewEditModalOpen && selectedRecord && (
         <UpdatePark
+          setNotifications={setNotifications}
           cities={cities}
           setIsViewEditModalOpen={setIsViewEditModalOpen}
           isEditMode={isEditMode}
           setIsEditMode={setIsEditMode}
           selectedRecord={selectedRecord}
           setSelectedRecord={setSelectedRecord}
+          setParks={setParks}
           parks={parks}
-          updatePark={updatePark}
         />
       )}
 

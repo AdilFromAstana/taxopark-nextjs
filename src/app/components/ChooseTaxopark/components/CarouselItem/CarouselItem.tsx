@@ -8,6 +8,7 @@ import { LuClock3, LuGift } from "react-icons/lu";
 import { MdHeadsetMic, MdPercent } from "react-icons/md";
 import { TfiClose } from "react-icons/tfi";
 import ApplicationModal from "../ApplicationModal";
+import Image from "next/image";
 
 function formatNumber(number: number) {
   return number.toString().replace(/\B(?=(\d{3})+(?!\d))/g, " ");
@@ -39,7 +40,7 @@ const CarouselItem: React.FC<{
   return (
     <div className="relative h-[650px]">
       <div
-        className={`relative w-full h-full transform transition-transform duration-500`}
+        className="relative w-full h-full transform transition-transform duration-500"
         style={{
           transformStyle: "preserve-3d",
           perspective: "1000px",
@@ -53,9 +54,13 @@ const CarouselItem: React.FC<{
           }}
           onClick={toggleFlip}
         >
-          <img
+          <Image
             className="w-full h-44 object-cover rounded-t-lg"
-            src={item.image}
+            height={2000}
+            width={2000}
+            src={
+              "https://www.shbarcelona.ru/blog/ru/wp-content/uploads/2020/01/oli-woodman-fwYZ3B_QQco-unsplash.jpg"
+            }
             alt={item.title}
           />
           <div className="flex flex-col items-start gap-2 p-4 flex-grow">
@@ -151,7 +156,6 @@ const CarouselItem: React.FC<{
           </button>
         </div>
       </div>
-
       <ApplicationModal isOpen={isModalOpen} onClose={closeModal} />
     </div>
   );

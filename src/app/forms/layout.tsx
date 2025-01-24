@@ -12,7 +12,7 @@ const AdminLayout = ({ children }: { children: React.ReactNode }) => {
       link: "/parks",
     },
     {
-      label: "Формы",
+      label: "Заявки",
       link: "/forms",
     },
   ];
@@ -31,13 +31,19 @@ const AdminLayout = ({ children }: { children: React.ReactNode }) => {
           {menuItems.map((item, index) => (
             <Link
               key={index}
-              href={item.link}
+              href={pathname === item.link ? "#" : item.link}
               passHref
-              className={`block py-2 px-4 transition-all truncate ${pathname === item.link
+              className={`block py-2 px-4 transition-all truncate ${
+                pathname === item.link
                   ? "bg-gray-700 font-bold"
                   : "hover:bg-gray-700"
-                }`}
+              }`}
               title={item.label}
+              onClick={(e) => {
+                if (pathname === item.link) {
+                  e.preventDefault(); // Предотвращаем переход, если это текущий маршрут
+                }
+              }}
             >
               {item.label}
             </Link>

@@ -7,11 +7,12 @@ export interface Park {
   accountantSupport?: boolean | null;
   yandexGasStation?: boolean | null;
   supportWorkTime?: string | null;
-  parkCommission?: number | null;
+  parkCommission: number;
+  averageCheck: number;
   parkPromotions?: number[] | null;
   paymentType?: number | null;
   active: boolean;
-  
+
   rating?: number | null;
   cityId: string;
   title: string;
@@ -36,3 +37,18 @@ export interface City {
   id: string; // Уникальный идентификатор города
   title: string; // Название города
 }
+
+export interface ApiError {
+  message: string; // Основное сообщение об ошибке
+  status?: number; // HTTP-статус код (если доступен)
+  details?: string[]; // Дополнительные детали об ошибке
+}
+
+export interface GetParks {
+  parks: Park[];
+  total: number;
+  page: number;
+  totalPages: number;
+}
+
+export type SortOrder = "asc" | "desc" | null;

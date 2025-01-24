@@ -1,11 +1,14 @@
 "use client";
 
-import { useState } from "react";
+import { memo, useState } from "react";
 import Carousel from "./components/Carousel";
 import Filters from "./components/Filters";
+import { Park } from "@/app/interfaces/interfaces";
 
-const ChooseTaxopark = ({ parks }) => {
+const ChooseTaxopark: React.FC<{ parks: Park[] }> = memo(() => {
   const [filteredItems, setFilteredItems] = useState<unknown[]>([]);
+  const [totalRecords, setTotalRecords] = useState(0);
+  const [isLoading, setIsLoading] = useState(true);
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
 
   return (
@@ -19,11 +22,15 @@ const ChooseTaxopark = ({ parks }) => {
         </span>
       </div>
       <div className="hidden lg:flex w-full mb-4">
-        <Filters setFilteredItems={setFilteredItems} parks={parks} />
+        <Filters
+          setFilteredItems={setFilteredItems}
+          setTotalRecords={setTotalRecords}
+          setIsLoading={setIsLoading}
+        />
       </div>
       <div className="flex justify-between items-center w-full mb-6">
         <h3 className="text-lg font-semibold">
-          Найдено таксопарков: {filteredItems.length}
+          Найдено таксопарков: {totalRecords}
         </h3>
         <button
           className="bg-blue-500 text-white py-2 px-4 rounded hover:bg-blue-600"
@@ -32,11 +39,15 @@ const ChooseTaxopark = ({ parks }) => {
           Расчитать доход
         </button>
       </div>
-      <Carousel items={filteredItems} />
+      <Carousel items={filteredItems} isLoading={isLoading} />
       {isDrawerOpen && (
         <div className="fixed inset-0 bg-gray-900 bg-opacity-50 flex items-center justify-center z-50">
           <div className="bg-white rounded-lg w-full max-w-md p-6">
-            <Filters setFilteredItems={setFilteredItems} />
+            <Filters
+              setFilteredItems={setFilteredItems}
+              setTotalRecords={setTotalRecords}
+              setIsLoading={setIsLoading}
+            />
             <button
               className="mt-4 w-full bg-blue-500 text-white py-2 px-4 rounded hover:bg-blue-600"
               onClick={() => setIsDrawerOpen(false)}
@@ -48,6 +59,7 @@ const ChooseTaxopark = ({ parks }) => {
       )}
     </div>
   );
-};
+});
+ChooseTaxopark.displayName = "ChooseTaxopark";
 
 export default ChooseTaxopark;

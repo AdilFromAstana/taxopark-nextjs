@@ -1,37 +1,32 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
-import { Form } from "@/app/interfaces/interfaces";
+import React, { memo, useEffect, useState } from "react";
+import { Form, SortOrder } from "@/app/interfaces/interfaces";
 // import { LuFilter } from "react-icons/lu";
 import { BiSortAlt2 } from "react-icons/bi";
 import { GoSortAsc, GoSortDesc } from "react-icons/go";
-import CreateForm from "./components/CreateForm";
 import UpdateForm from "./components/UpdateForm";
-
-type SortOrder = "asc" | "desc" | null;
 
 interface FormTableProps {
   cities: any[];
 }
 
-const FormTable: React.FC<FormTableProps> = ({ cities }) => {
-  const [isCreateModalOpen, setIsCreateModalOpen] = useState<boolean>(false);
+interface GetForms {
+  forms: Form[];
+  total: number;
+  page: number;
+  totalPages: number;
+}
+
+const FormTable: React.FC<FormTableProps> = memo(() => {
   const [selectedRecord, setSelectedRecord] = useState<Form | null>(null);
   const [totalRecords, setTotalRecords] = useState<number>(0);
   const [currentPage, setCurrentPage] = useState<number>(1);
   const [limit, setLimit] = useState<number>(10);
-  const [isEditMode, setIsEditMode] = useState<boolean>(false);
+  const [isLoading, setIsLoading] = useState<boolean>(true);
   const [forms, setForms] = useState<Form[]>([]);
   const [isViewEditModalOpen, setIsViewEditModalOpen] =
     useState<boolean>(false);
-
-  const [newRecord, setNewRecord] = useState<
-    Omit<Form, "id" | "Park" | "createdAt" | "updatedAt">
-  >({
-    name: "",
-    formType: "taxiPark",
-    phoneNumber: "",
-  });
 
   const [sortConfig, setSortConfig] = useState<{
     key: keyof Form | null;
@@ -53,108 +48,43 @@ const FormTable: React.FC<FormTableProps> = ({ cities }) => {
     });
   };
 
-  const handleEditRecord = () => {
-    if (selectedRecord) {
-      setForms((prevData) =>
-        prevData.map((item) =>
-          item.id === selectedRecord.id ? selectedRecord : item
-        )
-      );
-    }
-    setIsViewEditModalOpen(false);
-    setIsEditMode(false);
-    setSelectedRecord(null);
-  };
-
   const handleViewRecord = (record: Form) => {
     setSelectedRecord(record);
-    setIsEditMode(false);
     setIsViewEditModalOpen(true);
   };
 
-  const handleArchiveRecord = (id: string) => {
-    setForms((prevData) =>
-      prevData.map((item) =>
-        item.id === id ? { ...item, archived: true } : item
-      )
-    );
-  };
-
-  const fetchData = async (page: number, limit: number) => {
+  const fetchData = async () => {
     try {
+      setIsLoading(true);
       const response = await fetch(
-        `http://localhost:5000/api/forms?page=${page}&limit=${limit}`
+        `http://localhost:5000/api/forms?page=${currentPage}&limit=${limit}&sortField=${sortConfig.key}&sortOrder=${sortConfig.order}`
       );
-      const result: FormTableProps = await response.json();
-      console.log(result);
+      const result: GetForms = await response.json();
       setForms(result.forms);
       setTotalRecords(result.totalPages);
     } catch (error) {
       console.error("Ошибка при загрузке данных: ", error);
+    } finally {
+      setIsLoading(false);
     }
   };
 
   useEffect(() => {
-    fetchData(currentPage, limit);
-  }, [currentPage, limit]);
-
-  useEffect(() => {
-    if (sortConfig.key && sortConfig.order) {
-      const sortedParks = [...forms].sort((a, b) => {
-        let aValue, bValue;
-
-        if (sortConfig.key === "Park") {
-          aValue = a.Park?.title || "";
-          bValue = b.Park?.title || "";
-        } else {
-          aValue = a[sortConfig.key!];
-          bValue = b[sortConfig.key!];
-        }
-
-        if (typeof aValue === "string" && typeof bValue === "string") {
-          return sortConfig.order === "asc"
-            ? aValue.localeCompare(bValue)
-            : bValue.localeCompare(aValue);
-        }
-
-        if (typeof aValue === "number" && typeof bValue === "number") {
-          const aDigits = aValue.toString().length;
-          const bDigits = bValue.toString().length;
-          if (aDigits !== bDigits) {
-            return sortConfig.order === "asc"
-              ? aDigits - bDigits
-              : bDigits - aDigits;
-          }
-          return sortConfig.order === "asc" ? aValue - bValue : bValue - aValue;
-        }
-
-        if (typeof aValue === "object" && typeof bValue === "object") {
-          const aValue = a.Park?.title || "";
-          const bValue = a.Park?.title || "";
-          return sortConfig.order === "asc"
-            ? aValue.localeCompare(bValue)
-            : bValue.localeCompare(aValue);
-        }
-
-        return 0;
-      });
-
-      setForms(sortedParks);
-    }
-  }, [sortConfig]);
+    fetchData();
+  }, [currentPage, limit, sortConfig]);
 
   return (
     <div className="p-4 h-full flex flex-col gap-4">
-      <h1 className="text-2xl font-bold">Заявки</h1>
-
-      <button
-        className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 transition duration-200"
-        onClick={() => setIsCreateModalOpen(true)}
-      >
-        Добавить таксопарк
-      </button>
+      <div className="flex justify-between items-center">
+        <h1 className="text-2xl font-bold">Заявки</h1>
+      </div>
 
       <div className="overflow-auto">
+        {isLoading && (
+          <div className="absolute inset-0 bg-black bg-opacity-30 flex items-center justify-center z-50">
+            <div className="loader ease-linear rounded-full border-4 border-t-4 border-gray-200 h-12 w-12"></div>
+          </div>
+        )}
         <table className="w-full border-collapse border border-gray-300 text-sm">
           <thead className="bg-gray-100">
             <tr>
@@ -164,7 +94,7 @@ const FormTable: React.FC<FormTableProps> = ({ cities }) => {
                   className="flex justify-center items-center cursor-pointer"
                   onClick={() => handleSort("name")}
                 >
-                  Название
+                  ФИО
                   {sortConfig.key === "name" && sortConfig.order ? (
                     sortConfig.order === "asc" ? (
                       <GoSortAsc fontSize="20px" />
@@ -181,7 +111,7 @@ const FormTable: React.FC<FormTableProps> = ({ cities }) => {
                   className="flex justify-center items-center cursor-pointer"
                   onClick={() => handleSort("Park")}
                 >
-                  Город
+                  Таксопарк
                   {sortConfig.key === "Park" && sortConfig.order ? (
                     sortConfig.order === "asc" ? (
                       <GoSortAsc fontSize="20px" />
@@ -198,7 +128,7 @@ const FormTable: React.FC<FormTableProps> = ({ cities }) => {
                   className="flex justify-center items-center cursor-pointer"
                   onClick={() => handleSort("phoneNumber")}
                 >
-                  Комиссия парка
+                  Номер телефона
                   {sortConfig.key === "phoneNumber" && sortConfig.order ? (
                     sortConfig.order === "asc" ? (
                       <GoSortAsc fontSize="20px" />
@@ -211,9 +141,22 @@ const FormTable: React.FC<FormTableProps> = ({ cities }) => {
                 </div>
               </th>
               <th className="border border-gray-300 px-4 py-2">
-                Яндекс заправки
+                <div
+                  className="flex justify-center items-center cursor-pointer"
+                  onClick={() => handleSort("createdAt")}
+                >
+                  Время отправки
+                  {sortConfig.key === "createdAt" && sortConfig.order ? (
+                    sortConfig.order === "asc" ? (
+                      <GoSortAsc fontSize="20px" />
+                    ) : (
+                      <GoSortDesc fontSize="20px" />
+                    )
+                  ) : (
+                    <BiSortAlt2 fontSize="20px" />
+                  )}
+                </div>
               </th>
-              <th className="border border-gray-300 px-4 py-2">Действия</th>
             </tr>
           </thead>
           <tbody>
@@ -224,7 +167,7 @@ const FormTable: React.FC<FormTableProps> = ({ cities }) => {
                 onClick={() => handleViewRecord(item)}
               >
                 <td className="border border-gray-300 px-4 py-2 text-center">
-                  {i + 1}
+                  {(currentPage - 1) * limit + i + 1}
                 </td>
                 <td className="border border-gray-300 px-4 py-2">
                   {item.name}
@@ -246,14 +189,6 @@ const FormTable: React.FC<FormTableProps> = ({ cities }) => {
                         second: "2-digit",
                       })
                     : "Нет данных"}
-                </td>
-                <td className="border border-gray-300 px-4 py-2 text-center space-x-2">
-                  <button
-                    className="bg-red-500 text-white px-2 py-1 rounded hover:bg-red-600 transition duration-200"
-                    onClick={() => handleArchiveRecord(item.id)}
-                  >
-                    Архивировать
-                  </button>
                 </td>
               </tr>
             ))}
@@ -302,16 +237,13 @@ const FormTable: React.FC<FormTableProps> = ({ cities }) => {
       {isViewEditModalOpen && selectedRecord && (
         <UpdateForm
           setIsViewEditModalOpen={setIsViewEditModalOpen}
-          isEditMode={isEditMode}
-          setIsEditMode={setIsEditMode}
           selectedRecord={selectedRecord}
-          setSelectedRecord={setSelectedRecord}
-          forms={forms}
-          handleEditRecord={handleEditRecord}
         />
       )}
     </div>
   );
-};
+});
+
+FormTable.displayName = "FormTable";
 
 export default FormTable;

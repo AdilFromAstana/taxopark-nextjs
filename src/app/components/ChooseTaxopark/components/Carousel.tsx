@@ -6,6 +6,7 @@ import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
 import { AiOutlineFrown } from "react-icons/ai";
 import CarouselItem from "./CarouselItem/CarouselItem";
+import CarouselItemSkeleton from "./CarouselItemSkeleton/CarouselItemSkeleton";
 
 const getCardCount = (width = 429) => {
   if (width <= 430) {
@@ -19,10 +20,9 @@ const getCardCount = (width = 429) => {
   }
 };
 
-const Carousel: React.FC<{ items: unknown[] }> = ({
+const Carousel: React.FC<{ items: unknown[]; isLoading: boolean }> = ({
   items,
-}: {
-  items: unknown[];
+  isLoading,
 }) => {
   const [carouselItems, setCarouselItems] = useState<unknown[]>([]);
   const [carouselDisabled, setCarouselDisabled] = useState(false);
@@ -52,6 +52,16 @@ const Carousel: React.FC<{ items: unknown[] }> = ({
       sliderRef.current.slickGoTo(0);
     }
   }, [items]);
+
+  if (isLoading) {
+    return (
+      <div className="w-full flex justify-between">
+        {Array.from({ length: 3 }).map((_, index) => (
+          <CarouselItemSkeleton key={index} />
+        ))}
+      </div>
+    );
+  }
 
   if (carouselItems.length === 0) {
     return (

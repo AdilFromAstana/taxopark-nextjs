@@ -5,7 +5,6 @@ import ModalDropdown from "./ModalDropdown";
 import MultiSelect from "./MultiSelect";
 import StarRating from "./StarRating";
 import TextInput from "./TextInput";
-import NotificationBar from "../../NotificationBar/NotificationBar";
 
 interface Notification {
   id: string;
@@ -17,14 +16,11 @@ interface CreateParkProps {
   setIsCreateModalOpen: React.Dispatch<React.SetStateAction<boolean>>;
   cities: any[];
   setParks: React.Dispatch<React.SetStateAction<Park[]>>;
-  notifications: Notification[];
   setNotifications: React.Dispatch<React.SetStateAction<Notification[]>>;
 }
 
 const CreatePark: React.FC<CreateParkProps> = memo(
-  ({ setIsCreateModalOpen, cities, setParks, notifications, setNotifications }) => {
-
-    const DEFAULT_DURATION = 5000;
+  ({ setIsCreateModalOpen, cities, setParks, setNotifications }) => {
     const addNotification = (notification: Omit<Notification, "id">) => {
       const id = Math.random().toString(36).substr(2, 9);
 
@@ -36,7 +32,7 @@ const CreatePark: React.FC<CreateParkProps> = memo(
         setNotifications((prev) =>
           prev.filter((n: Notification) => n.id !== id)
         );
-      }, DEFAULT_DURATION);
+      }, 5000);
     };
 
     const [newRecord, setNewRecord] = useState<
@@ -107,45 +103,30 @@ const CreatePark: React.FC<CreateParkProps> = memo(
     const createPark = async () => {
       try {
         setIsLoading(true);
-
-        // Отправляем данные на сервер
         const response = await axios.post(
           "http://localhost:5000/api/parks",
           newRecord
         );
-
-        // Проверяем ответ сервера
         const createdPark = response.data;
         if (!createdPark) {
           throw new Error("Некорректный ответ сервера");
         }
-
-        // Обновляем список парков
         setParks((prevParks) => [...prevParks, createdPark]);
-
-        // Добавляем уведомление об успехе
         addNotification({
           type: "success",
           message: "Таксопарк успешно добавлен!",
         });
-
-        // Закрываем модальное окно только после завершения уведомления
-        setTimeout(() => {
-          setIsCreateModalOpen(false);
-        }, 100); // Небольшая задержка для завершения обновления состояния
+        setIsCreateModalOpen(false);
       } catch (error: any) {
-        console.error("Ошибка при создании таксопарка:", error);
-
-        // Добавляем уведомление об ошибке
         addNotification({
           type: "error",
-          message: error.message || "Произошла ошибка при добавлении таксопарка",
+          message:
+            error.message || "Произошла ошибка при добавлении таксопарка",
         });
       } finally {
         setIsLoading(false);
       }
     };
-
 
     return (
       <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
@@ -160,9 +141,7 @@ const CreatePark: React.FC<CreateParkProps> = memo(
             <TextInput
               value={newRecord.title}
               label="Название"
-              onChange={(value) =>
-                setNewRecord({ ...newRecord, title: value })
-              }
+              onChange={(value) => setNewRecord({ ...newRecord, title: value })}
             />
             <div className="w-full">
               <label className="block text-sm font-medium mb-1">Город</label>
@@ -219,7 +198,8 @@ const CreatePark: React.FC<CreateParkProps> = memo(
                 if (/^\d*$/.test(value)) {
                   setNewRecord({
                     ...newRecord,
-                    transferPaymentCommission: value === "" ? null : Number(value),
+                    transferPaymentCommission:
+                      value === "" ? null : Number(value),
                   });
                 }
               }}
