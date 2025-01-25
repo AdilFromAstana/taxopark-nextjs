@@ -18,7 +18,7 @@ const AdminLayout = ({ children }: { children: React.ReactNode }) => {
   ];
 
   return (
-    <div className="flex h-full">
+    <div className="flex h-screen">
       <aside
         className={`bg-gray-800 text-white transition-all duration-300 w-64`}
       >

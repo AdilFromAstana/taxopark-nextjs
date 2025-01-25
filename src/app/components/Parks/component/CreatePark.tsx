@@ -1,16 +1,10 @@
-import { Park } from "@/app/interfaces/interfaces";
+import { Notification, Park } from "@/app/interfaces/interfaces";
 import axios from "axios";
 import React, { memo, useState } from "react";
 import ModalDropdown from "./ModalDropdown";
 import MultiSelect from "./MultiSelect";
 import StarRating from "./StarRating";
 import TextInput from "./TextInput";
-
-interface Notification {
-  id: string;
-  type: "success" | "error";
-  message: string;
-}
 
 interface CreateParkProps {
   setIsCreateModalOpen: React.Dispatch<React.SetStateAction<boolean>>;
@@ -40,7 +34,7 @@ const CreatePark: React.FC<CreateParkProps> = memo(
     >({
       title: "",
       cityId: "",
-      parkCommission: null,
+      parkCommission: 0,
       parkPromotions: [],
       paymentType: null,
       accountantSupport: null,
@@ -51,6 +45,7 @@ const CreatePark: React.FC<CreateParkProps> = memo(
       rating: null,
       supportWorkTime: null,
       yandexGasStation: null,
+      averageCheck: 0
     });
 
     const [startTime, setStartTime] = useState("");
@@ -211,7 +206,7 @@ const CreatePark: React.FC<CreateParkProps> = memo(
                 if (/^\d*$/.test(value)) {
                   setNewRecord({
                     ...newRecord,
-                    parkCommission: value === "" ? null : Number(value),
+                    parkCommission: value === "" ? 0 : Number(value),
                   });
                 }
               }}
@@ -233,10 +228,11 @@ const CreatePark: React.FC<CreateParkProps> = memo(
             <MultiSelect
               label="Бонусы"
               options={[
-                { label: "Скидка 10%", value: 1 },
-                { label: "Бесплатный вход", value: 2 },
-                { label: "Семейный пакет", value: 3 },
-                { label: "Сезонный абонемент", value: 4 },
+                { label: "Гарантированные бонусы", value: 1 },
+                { label: "Приветственные бонусы", value: 2 },
+                { label: "Розыгрыш", value: 3 },
+                { label: "Бонус за активность", value: 4 },
+                { label: "Приведи друга", value: 5 },
               ]}
               values={newRecord.parkPromotions || []}
               onChange={(values) =>

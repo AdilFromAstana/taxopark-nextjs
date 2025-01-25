@@ -11,7 +11,6 @@ interface NotificationBarProps {
 }
 
 const NotificationBar: React.FC<NotificationBarProps> = ({ notifications }) => {
-    console.log("notifications: ", notifications)
     return (
         <div className="fixed top-4 right-4 space-y-4 z-50">
             {notifications.map((notification) => (

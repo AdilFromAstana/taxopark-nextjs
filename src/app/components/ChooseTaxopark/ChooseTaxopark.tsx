@@ -1,19 +1,37 @@
 "use client";
 
-import { memo, useState } from "react";
-import Carousel from "./components/Carousel";
+import { memo, useEffect, useState } from "react";
+// import Carousel from "./components/Carousel";
 import Filters from "./components/Filters";
-import { Park } from "@/app/interfaces/interfaces";
+import Carousel from "./components/Carousel";
+import axios from "axios";
+import { City } from "@/app/interfaces/interfaces";
 
-const ChooseTaxopark: React.FC<{ parks: Park[] }> = memo(() => {
+const ChooseTaxopark = memo(() => {
   const [filteredItems, setFilteredItems] = useState<unknown[]>([]);
   const [totalRecords, setTotalRecords] = useState(0);
   const [isLoading, setIsLoading] = useState(true);
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
+  const [cities, setCities] = useState<City[]>([])
+
+  const getCities = async () => {
+    try {
+      const response: { data: City[] } = await axios.get("http://localhost:5000/api/cities")
+      setCities(response.data)
+    } catch (e) {
+      console.error(e)
+    } finally {
+
+    }
+  }
+
+  useEffect(() => {
+    getCities()
+  }, [])
 
   return (
-    <div className="flex flex-col items-center mt-10 w-full lg:w-[70vw] mx-auto">
-      <div className="text-center mb-6">
+    <section className="flex flex-col items-center mt-10 mx-auto">
+      <div className="text-center mb-6 w-full lg:w-[70vw]">
         <h1 className="text-2xl lg:text-4xl font-bold">
           Выберите лучший таксопарк
         </h1>
@@ -21,14 +39,15 @@ const ChooseTaxopark: React.FC<{ parks: Park[] }> = memo(() => {
           Сравните комиссии, скорость выплат и бонусы разных таксопарков
         </span>
       </div>
-      <div className="hidden lg:flex w-full mb-4">
+      <div className="hidden lg:flex w-full lg:w-[70vw] mb-4">
         <Filters
           setFilteredItems={setFilteredItems}
           setTotalRecords={setTotalRecords}
           setIsLoading={setIsLoading}
+          cities={cities}
         />
       </div>
-      <div className="flex justify-between items-center w-full mb-6">
+      <div className="flex justify-between items-center w-full md:w-auto lg:w-[70vw] mb-6">
         <h3 className="text-lg font-semibold">
           Найдено таксопарков: {totalRecords}
         </h3>
@@ -47,6 +66,7 @@ const ChooseTaxopark: React.FC<{ parks: Park[] }> = memo(() => {
               setFilteredItems={setFilteredItems}
               setTotalRecords={setTotalRecords}
               setIsLoading={setIsLoading}
+              cities={cities}
             />
             <button
               className="mt-4 w-full bg-blue-500 text-white py-2 px-4 rounded hover:bg-blue-600"
@@ -57,7 +77,7 @@ const ChooseTaxopark: React.FC<{ parks: Park[] }> = memo(() => {
           </div>
         </div>
       )}
-    </div>
+    </section>
   );
 });
 ChooseTaxopark.displayName = "ChooseTaxopark";

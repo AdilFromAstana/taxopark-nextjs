@@ -1,16 +1,21 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import axios from "axios";
+import React, { memo, useEffect, useState } from "react";
 import ReactDOM from "react-dom";
 import PhoneInput from "react-phone-input-2";
 import "react-phone-input-2/lib/style.css";
 
-const ApplicationModal = ({
+const ApplicationModal = memo(({
   isOpen,
   onClose,
+  formType = "consultation",
+  parkId
 }: {
   isOpen: boolean;
   onClose: () => void;
+  formType: "taxiPark" | "consultation";
+  parkId?: string
 }) => {
   const [step, setStep] = useState(1);
   const [otpSent, setOtpSent] = useState(false);
@@ -19,9 +24,21 @@ const ApplicationModal = ({
   const otp = "1234";
   const [inputOtp, setInputOtp] = useState("");
   const [phone, setPhone] = useState<string>("");
+  const [name, setName] = useState<string>("");
 
-  console.log(otpSent)
-  console.log(timer)
+  const createForm = async () => {
+    try {
+      const response = await axios.post("http://localhost:5000/api/forms", { phoneNumber: phone, name, formType, parkId }, {
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
+      return response.data;
+    } catch (error: any) {
+      console.error("Ошибка при создании формы:", error.response?.data || error.message);
+      throw error;
+    }
+  };
 
   useEffect(() => {
     if (isOpen) {
@@ -54,6 +71,7 @@ const ApplicationModal = ({
         return prev - 1;
       });
     }, 1000);
+    createForm()
   };
 
   const handleOtpVerification = () => {
@@ -69,19 +87,16 @@ const ApplicationModal = ({
 
   return ReactDOM.createPortal(
     <div
-      className={`fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center transition-opacity duration-300 ${
-        isOpen ? "opacity-100" : "opacity-0"
-      }`}
+      className={`fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center transition-opacity duration-300 ${isOpen ? "opacity-100" : "opacity-0"
+        }`}
       style={{
         pointerEvents: isOpen ? "auto" : "none",
       }}
     >
       <div
-        className={`bg-white rounded-lg shadow-lg w-full max-w-md p-6 transform transition-transform duration-300 ${
-          isOpen ? "scale-100" : "scale-90"
-        }`}
+        className={`bg-white rounded-lg shadow-lg w-full max-w-md p-6 transform transition-transform duration-300 ${isOpen ? "scale-100" : "scale-90"
+          }`}
       >
-        {/* Кнопка закрытия */}
         <button
           className="absolute top-4 right-4 text-gray-500 hover:text-gray-800"
           onClick={onClose}
@@ -93,8 +108,8 @@ const ApplicationModal = ({
           {step === 1
             ? "Отправить заявку"
             : step === 2
-            ? "Код подтверждения"
-            : "Успешно отправлено"}
+              ? "Код подтверждения"
+              : "Успешно отправлено"}
         </h2>
 
         {step === 1 && (
@@ -110,7 +125,7 @@ const ApplicationModal = ({
                 ФИО
               </label>
               <input
-                id="name"
+                onChange={(e) => setName(e.target.value)}
                 type="text"
                 className="w-full border rounded px-3 py-2 focus:outline-none focus:ring focus:ring-blue-300"
                 placeholder="Введите ФИО"
@@ -129,6 +144,7 @@ const ApplicationModal = ({
                 onChange={(value: string) => setPhone(value)}
                 placeholder="+7-777-77-77-77"
                 disableDropdown={true}
+                inputStyle={{ width: '100%' }}
                 inputClass="w-full border rounded px-3 py-2 focus:outline-none focus:ring focus:ring-blue-300"
               />
             </div>
@@ -181,6 +197,6 @@ const ApplicationModal = ({
     </div>,
     document.body
   );
-};
+})
 
 export default ApplicationModal;

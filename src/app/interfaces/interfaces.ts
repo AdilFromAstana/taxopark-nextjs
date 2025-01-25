@@ -12,7 +12,6 @@ export interface Park {
   parkPromotions?: number[] | null;
   paymentType?: number | null;
   active: boolean;
-
   rating?: number | null;
   cityId: string;
   title: string;
@@ -20,6 +19,10 @@ export interface Park {
     id: string;
     title: string;
   };
+}
+
+export interface ParkInCarousel extends Park {
+  approximateIncome: number
 }
 
 export interface Form {
@@ -52,3 +55,20 @@ export interface GetParks {
 }
 
 export type SortOrder = "asc" | "desc" | null;
+
+export interface Notification {
+  id: string;
+  type: "success" | "error";
+  message: string;
+}
+
+export interface FormTableProps {
+  cities: any[];
+}
+
+export interface GetForms {
+  forms: Form[];
+  total: number;
+  page: number;
+  totalPages: number;
+}

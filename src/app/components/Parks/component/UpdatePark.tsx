@@ -1,15 +1,9 @@
-import { Park } from "@/app/interfaces/interfaces";
+import { Notification, Park } from "@/app/interfaces/interfaces";
 import { memo, useState } from "react";
 import ModalDropdown from "./ModalDropdown";
 import MultiSelect from "./MultiSelect";
 import TextInput from "./TextInput";
 import axios from "axios";
-
-interface Notification {
-  id: string;
-  type: "success" | "error";
-  message: string;
-}
 
 interface UpdateParkProps {
   setIsViewEditModalOpen: React.Dispatch<React.SetStateAction<boolean>>;
@@ -20,7 +14,7 @@ interface UpdateParkProps {
   parks: Park[];
   cities: any[];
   setParks: React.Dispatch<React.SetStateAction<Park[]>>;
-  setNotifications: React.Dispatch<React.SetStateAction<any[]>>;
+  setNotifications: React.Dispatch<React.SetStateAction<Notification[]>>;
 }
 
 const UpdatePark: React.FC<UpdateParkProps> = memo(
@@ -235,7 +229,7 @@ const UpdatePark: React.FC<UpdateParkProps> = memo(
                   if (/^\d*$/.test(value)) {
                     setSelectedRecord({
                       ...selectedRecord,
-                      parkCommission: value === "" ? null : Number(value),
+                      parkCommission: value === "" ? 0 : Number(value),
                     });
                   }
                 }}
@@ -266,10 +260,11 @@ const UpdatePark: React.FC<UpdateParkProps> = memo(
               <MultiSelect
                 label="Бонусы"
                 options={[
-                  { label: "Скидка 10%", value: 1 },
-                  { label: "Бесплатный вход", value: 2 },
-                  { label: "Семейный пакет", value: 3 },
-                  { label: "Сезонный абонемент", value: 4 },
+                  { label: "Гарантированные бонусы", value: 1 },
+                  { label: "Приветственные бонусы", value: 2 },
+                  { label: "Розыгрыш", value: 3 },
+                  { label: "Бонус за активность", value: 4 },
+                  { label: "Приведи друга", value: 5 },
                 ]}
                 values={selectedRecord.parkPromotions || []}
                 onChange={(values) =>

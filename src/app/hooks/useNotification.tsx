@@ -11,7 +11,6 @@ export const useNotification = () => {
     const DEFAULT_DURATION = 5000; // Жестко зашитая продолжительность
 
     const addNotification = (notification: Omit<Notification, "id">) => {
-        console.log("notification: ", notification)
         const id = Math.random().toString(36).substr(2, 9); // Генерация уникального ID
         setNotifications((prev) => [...prev, { ...notification, id }]);
 

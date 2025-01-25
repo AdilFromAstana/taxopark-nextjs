@@ -1,100 +1,140 @@
-"use clinet";
+"use client";
 
-import React, { useEffect, useRef, useState } from "react";
-import Slider from "react-slick";
-import "slick-carousel/slick/slick.css";
-import "slick-carousel/slick/slick-theme.css";
-import { AiOutlineFrown } from "react-icons/ai";
-import CarouselItem from "./CarouselItem/CarouselItem";
+import React, { useState, useRef, useEffect } from "react";
 import CarouselItemSkeleton from "./CarouselItemSkeleton/CarouselItemSkeleton";
+import CarouselItem from "./CarouselItem/CarouselItem";
+import { FaCircleArrowLeft, FaCircleArrowRight } from "react-icons/fa6";
 
-const getCardCount = (width = 429) => {
-  if (width <= 430) {
-    return 1.1;
-  } else if (width > 430 && width < 768) {
-    return 1.5;
-  } else if (width > 768 && width < 1024) {
-    return 2;
-  } else {
-    return 3;
-  }
+type CarouselRef = {
+    startX: number | null;
 };
 
-const Carousel: React.FC<{ items: unknown[]; isLoading: boolean }> = ({
-  items,
-  isLoading,
-}) => {
-  const [carouselItems, setCarouselItems] = useState<unknown[]>([]);
-  const [carouselDisabled, setCarouselDisabled] = useState(false);
-  const [slidesToShow, setSlidesToShow] = useState(1);
-  const sliderRef = useRef<Slider | null>(null);
-
-  useEffect(() => {
-    // Устанавливаем количество карточек только на клиенте
-    const handleResize = () => {
-      setSlidesToShow(getCardCount(window.innerWidth));
-    };
-
-    handleResize(); // Установить начальное значение
-
-    // Добавляем слушатель изменения размера окна
-    window.addEventListener("resize", handleResize);
-
-    return () => {
-      // Удаляем слушатель при размонтировании компонента
-      window.removeEventListener("resize", handleResize);
-    };
-  }, []);
-
-  useEffect(() => {
-    setCarouselItems(items);
-    if (sliderRef.current) {
-      sliderRef.current.slickGoTo(0);
+const getCardCount = (width = 429): number => {
+    if (width <= 430) {
+        return 1.1;
+    } else if (width > 430 && width < 768) {
+        return 1.5;
+    } else if (width > 768 && width < 1024) {
+        return 2;
+    } else {
+        return 3;
     }
-  }, [items]);
+};
 
-  if (isLoading) {
-    return (
-      <div className="w-full flex justify-between">
-        {Array.from({ length: 3 }).map((_, index) => (
-          <CarouselItemSkeleton key={index} />
-        ))}
-      </div>
+const Carousel: React.FC<{ items: any[]; isLoading: boolean }> = ({
+    items,
+    isLoading,
+}) => {
+    const [currentIndex, setCurrentIndex] = useState(0);
+    const [carouselItems, setCarouselItems] = useState<any[]>([]);
+    const carouselRef = useRef<CarouselRef>({ startX: null });
+    const [carouselDisabled, setCarouselDisabled] = useState(false);
+    const [slidesToShow, setSlidesToShow] = useState(
+        getCardCount()
     );
-  }
 
-  if (carouselItems.length === 0) {
-    return (
-      <div className="flex flex-col items-center justify-center text-center py-8">
-        <AiOutlineFrown className="text-6xl text-gray-400 mb-4" />
-        <h2 className="text-lg font-semibold text-gray-500">
-          К сожалению, таксопарков по вашему фильтру не нашлось!
-        </h2>
-      </div>
-    );
-  } else {
-    return (
-      <Slider
-        className="w-full"
-        dots={false}
-        swipe={!carouselDisabled}
-        infinite={false}
-        slidesToShow={slidesToShow}
-        slidesToScroll={1}
-        ref={sliderRef}
-      >
-        {carouselItems.map((item: any, index) => (
-          <CarouselItem
-            key={item.title}
-            index={index}
-            item={item}
-            setCarouselDisabled={setCarouselDisabled}
-            // isModalOpen={isModalOpen}
-          />
-        ))}
-      </Slider>
-    );
-  }
+    const handleNext = () => {
+        setCurrentIndex((prevIndex) =>
+            Math.min(prevIndex + 1, items.length - slidesToShow)
+        );
+    };
+
+    const handlePrev = () => {
+        setCurrentIndex((prevIndex) => Math.max(prevIndex - 1, 0));
+    };
+
+    const handleTouchStart = (e: React.TouchEvent<HTMLDivElement>) => {
+        const touch = e.touches[0];
+        carouselRef.current.startX = touch.clientX;
+    };
+
+    const handleTouchMove = (e: React.TouchEvent<HTMLDivElement>) => {
+        if (carouselRef.current.startX === null) return;
+        const touch = e.touches[0];
+        const diffX = carouselRef.current.startX - touch.clientX;
+
+        if (diffX > 50) {
+            handleNext();
+            carouselRef.current.startX = null;
+        } else if (diffX < -50) {
+            handlePrev();
+            carouselRef.current.startX = null;
+        }
+    };
+
+    useEffect(() => {
+        const handleResize = () => {
+            setSlidesToShow(getCardCount(window.innerWidth));
+        };
+
+        window.addEventListener("resize", handleResize);
+        return () => {
+            window.removeEventListener("resize", handleResize);
+        };
+    }, []);
+
+    useEffect(() => {
+        setCarouselItems(items);
+
+        const carouselElement = carouselRef.current;
+        if (!carouselElement) return;
+
+        return () => {
+            if (carouselRef.current) {
+                carouselRef.current.startX = null;
+            }
+        };
+    }, [items]);
+
+    if (items && isLoading) {
+        return (
+            <div className="relative overflow-x-hidden overflow-y-visible w-[90vw] 2xl:w-[70vw] pb-4">
+                <div className="flex transition-transform duration-300 bg-transparent w-[90vw] 2xl:w-[70vw]">
+                    {Array.from({ length: 3 }).map((_, index) => (
+                        <CarouselItemSkeleton key={index} slidesToShow={slidesToShow} />
+                    ))}
+                </div>
+            </div>
+        );
+    } else {
+        return (
+            <div className="relative mx-auto w-[90vw] 2xl:w-[70vw] overflow-y-visible">
+                <div className="relative overflow-x-hidden overflow-y-visible w-[90vw] 2xl:w-[70vw] pb-4">
+                    <div
+                        ref={carouselRef as unknown as React.RefObject<HTMLDivElement>}
+                        className="flex transition-transform duration-300 bg-transparent w-[90vw] 2xl:w-[70vw]"
+                        style={{ transform: `translateX(-${currentIndex * (100 / slidesToShow)}%)` }}
+                        onTouchStart={handleTouchStart}
+                        onTouchMove={handleTouchMove}
+                    >
+                        {carouselItems.map((item: any) => (
+                            <CarouselItem
+                                key={item.id}
+                                slidesToShow={slidesToShow}
+                                item={item}
+                                setCarouselDisabled={setCarouselDisabled}
+                            />
+                        ))}
+                    </div>
+                </div>
+
+                <button
+                    className="absolute top-1/2 -left-4 lg:-left-4 transform -translate-y-1/2 lg:block hidden "
+                    onClick={handlePrev}
+                >
+                    <FaCircleArrowLeft fontSize="lg:36px 20px" />
+                </button>
+
+                <button
+                    className="absolute top-1/2 -right-4 lg:-right-4 transform -translate-y-1/2 lg:block hidden "
+                    onClick={handleNext}
+                >
+                    <FaCircleArrowRight fontSize="lg:36px 20px" />
+                </button>
+            </div>
+        );
+    }
+
 };
 
 export default Carousel;

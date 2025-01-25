@@ -6,7 +6,7 @@ export const viewport: Viewport = {
   userScalable: false,
 };
 
-async function getServerSideProps() {
+async function getCities() {
   try {
     const response = await fetch("http://localhost:5000/api/cities", {
       method: "GET",
@@ -31,6 +31,6 @@ async function getServerSideProps() {
 }
 
 export default async function ParksPage() {
-  const data = await getServerSideProps();
-  return <TaxiParkTable cities={data}/>;
+  const data = await getCities();
+  return <TaxiParkTable cities={data} />;
 }

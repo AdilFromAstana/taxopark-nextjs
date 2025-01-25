@@ -3,17 +3,11 @@
 import React, { memo, useEffect, useState } from "react";
 import CreatePark from "./component/CreatePark";
 import UpdatePark from "./component/UpdatePark";
-import { GetParks, Park, SortOrder } from "@/app/interfaces/interfaces";
+import { GetParks, Notification, Park, SortOrder } from "@/app/interfaces/interfaces";
 // import { LuFilter } from "react-icons/lu";
 import { BiSortAlt2 } from "react-icons/bi";
 import { GoSortAsc, GoSortDesc } from "react-icons/go";
 import NotificationBar from "../NotificationBar/NotificationBar";
-
-interface Notification {
-  id: string;
-  type: "success" | "error";
-  message: string;
-}
 
 interface TaxiParkTableProps {
   cities: any[];
@@ -44,8 +38,8 @@ const TaxiParkTable: React.FC<TaxiParkTableProps> = memo(({ cities }) => {
           ? prevConfig.order === "asc"
             ? "desc"
             : prevConfig.order === "desc"
-            ? null
-            : "asc"
+              ? null
+              : "asc"
           : "asc";
 
       return { key, order: newOrder };
