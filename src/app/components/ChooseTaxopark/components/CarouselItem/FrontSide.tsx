@@ -1,3 +1,4 @@
+import { formatNumber } from "@/app/common/common";
 import { ParkInCarousel } from "@/app/interfaces/interfaces";
 import Image from "next/image";
 import { memo } from "react";
@@ -19,10 +20,6 @@ const allParkPromotions = [
     { label: "Бонус за активность", value: 4 },
     { label: "Приведи друга", value: 5 },
 ];
-
-function formatNumber(number: number) {
-    return number.toString().replace(/\B(?=(\d{3})+(?!\d))/g, " ");
-}
 
 const FrontSide: React.FC<FrontSideProps> = memo(({ item, toggleFlip, openModal }) => {
 

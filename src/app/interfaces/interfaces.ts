@@ -72,3 +72,15 @@ export interface GetForms {
   page: number;
   totalPages: number;
 }
+
+export interface GetFormsParams {
+  filteredParks?: string[];
+  filterName?: string;
+  filterEndDate?: string;
+  filterStartDate?: string;
+}
+
+export interface SaveExcelButtonProps {
+  url: string
+  dataType: 'parks' | 'forms'
+}

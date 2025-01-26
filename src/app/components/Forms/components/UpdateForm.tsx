@@ -1,4 +1,5 @@
 import { Form } from "@/app/interfaces/interfaces";
+import { memo } from "react";
 
 const formTypes = {
   taxiPark: "Таксопарк",
@@ -10,19 +11,19 @@ interface UpdateFormProps {
   selectedRecord: Form;
 }
 
-const UpdateForm: React.FC<UpdateFormProps> = ({
+const UpdateForm: React.FC<UpdateFormProps> = memo(({
   setIsViewEditModalOpen,
   selectedRecord,
 }) => {
   const createdAt = selectedRecord.createdAt
     ? new Date(selectedRecord.createdAt).toLocaleString("ru-RU", {
-        year: "numeric",
-        month: "long",
-        day: "numeric",
-        hour: "2-digit",
-        minute: "2-digit",
-        second: "2-digit",
-      })
+      year: "numeric",
+      month: "long",
+      day: "numeric",
+      hour: "2-digit",
+      minute: "2-digit",
+      second: "2-digit",
+    })
     : "Нет данных";
 
   return (
@@ -99,5 +100,5 @@ const UpdateForm: React.FC<UpdateFormProps> = ({
       </div>
     </div>
   );
-};
+});
 export default UpdateForm;

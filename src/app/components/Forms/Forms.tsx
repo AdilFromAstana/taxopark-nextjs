@@ -1,36 +1,17 @@
 "use client";
 
 import React, { memo, useCallback, useEffect, useState } from "react";
-import { Form, FormTableProps, GetForms, GetParks, Park, SortOrder } from "@/app/interfaces/interfaces";
+import { Form, FormTableProps, GetForms, GetFormsParams, GetParks, Park, SortOrder } from "@/app/interfaces/interfaces";
 // import { LuFilter } from "react-icons/lu";
 import { BiSortAlt2 } from "react-icons/bi";
 import { GoSortAsc, GoSortDesc } from "react-icons/go";
 import UpdateForm from "./components/UpdateForm";
 import MultiSelect from "../Parks/component/MultiSelect";
-
-function formatPhoneNumber(phoneNumber: string) {
-  // Убираем все нецифровые символы из номера
-  const cleaned = phoneNumber.replace(/\D/g, "");
-
-  // Проверяем, что номер состоит из 11 цифр и начинается с "7" (Казахстан)
-  if (cleaned.length !== 11 || cleaned[0] !== "7") {
-    throw new Error("Некорректный номер телефона. Убедитесь, что номер начинается с +7 и состоит из 11 цифр.");
-  }
-
-  // Разбиваем номер на части и форматируем
-  const formatted = `+7-(${cleaned.slice(1, 4)})-${cleaned.slice(4, 7)}-${cleaned.slice(7, 9)}-${cleaned.slice(9)}`;
-  return formatted;
-}
-
-function debounce<T extends (...args: any[]) => void>(func: T, delay: number): (...args: Parameters<T>) => void {
-  let timeout: ReturnType<typeof setTimeout>;
-  return (...args: Parameters<T>) => {
-    clearTimeout(timeout);
-    timeout = setTimeout(() => func(...args), delay);
-  };
-}
+import SaveExcelButton from "../SaveExcelButton/SaveExcelButton";
+import { debounce, formatPhoneNumber } from "@/app/common/common";
 
 const FormTable: React.FC<FormTableProps> = memo(() => {
+  console.log("RENDER")
   const [selectedRecord, setSelectedRecord] = useState<Form | null>(null);
   const [totalRecords, setTotalRecords] = useState<number>(0);
   const [currentPage, setCurrentPage] = useState<number>(1);
@@ -39,7 +20,9 @@ const FormTable: React.FC<FormTableProps> = memo(() => {
   const [forms, setForms] = useState<Form[]>([]);
   const [parks, setParks] = useState<Park[]>([]);
   const [selectedParks, setSelectedParks] = useState<string[]>([])
-  const [filterName, setFilterName] = useState<string>("");
+  const [name, setName] = useState<string>("");
+  const [startDate, setStartDate] = useState<string>('')
+  const [endDate, setEndDate] = useState<string>('')
   const [isViewEditModalOpen, setIsViewEditModalOpen] =
     useState<boolean>(false);
 
@@ -77,7 +60,6 @@ const FormTable: React.FC<FormTableProps> = memo(() => {
       const result: GetParks = await response.json();
 
       setParks(result.parks);
-      setTotalRecords(result.totalPages);
     } catch (error) {
       console.error("Ошибка при загрузке данных: ", error);
     } finally {
@@ -91,29 +73,44 @@ const FormTable: React.FC<FormTableProps> = memo(() => {
   };
 
   const handleNameInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    debouncedSetFilterName(e.target.value); // Вызываем с дебаунсом
+    debouncedSetFilterName(e.target.value);
   };
 
   const debouncedFetchForms = useCallback(
     debounce((parks: string[]) => {
       fetchData({ filteredParks: parks });
-    }, 500),
+    }, 700),
     []
+  );
+
+  const debouncedSetFilterStartDate = useCallback(
+    (value: string) => {
+      selectStartDate(value);
+      fetchData({ filterStartDate: value });
+    }, []
+
+  );
+
+  const debouncedSetFilterEndDate = useCallback(
+    (value: string) => {
+      setEndDate(value);
+      fetchData({ filterEndDate: value });
+    }, []
   );
 
   const debouncedSetFilterName = useCallback(
     debounce((value: string) => {
-      setFilterName(value); // Устанавливаем значение фильтра
-      fetchData({ nameFilter: value }); // Вызываем API с фильтром
+      setName(value);
+      fetchData({ filterName: value });
     }, 700),
-    [] // Пустой массив зависимостей
+    []
   );
 
-  const fetchData = async ({ filteredParks = selectedParks, nameFilter = filterName }: { filteredParks?: string[], nameFilter?: string }) => {
+  const fetchData = async ({ filteredParks = selectedParks, filterName = name, filterStartDate = startDate, filterEndDate = endDate, }: GetFormsParams) => {
     try {
       setIsLoading(true);
       const response = await fetch(
-        `http://localhost:5000/api/forms?page=${currentPage}&limit=${limit}&sortField=${sortConfig.key}&sortOrder=${sortConfig.order}&selectedParks=${filteredParks.join(",")}&nameFilter=${nameFilter}`
+        `http://localhost:5000/api/forms?page=${currentPage}&limit=${limit}&sortField=${sortConfig.key}&sortOrder=${sortConfig.order}&selectedParks=${filteredParks.join(",")}&filterName=${filterName}&filterStartDate=${filterStartDate}&filterEndDate=${filterEndDate}`
       );
       const result: GetForms = await response.json();
 
@@ -123,6 +120,7 @@ const FormTable: React.FC<FormTableProps> = memo(() => {
           phoneNumber: formatPhoneNumber(form.phoneNumber),
         }))
       );
+      console.log("result.totalPages: ", result.totalPages)
       setTotalRecords(result.totalPages);
     } catch (error) {
       console.error("Ошибка при загрузке данных: ", error);
@@ -131,6 +129,19 @@ const FormTable: React.FC<FormTableProps> = memo(() => {
     }
   };
 
+  const selectStartDate = (value: string) => {
+    setStartDate(value)
+    if (!endDate) setEndDate('')
+  }
+
+  const calculateMinEndDate = (date: string): string => {
+    if (!date) return "";
+    const start = new Date(date);
+    start.setDate(start.getDate() + 1);
+    return start.toISOString().split("T")[0];
+  };
+
+  console.log("totalRecords: ", totalRecords)
 
   useEffect(() => {
     fetchData({});
@@ -144,6 +155,7 @@ const FormTable: React.FC<FormTableProps> = memo(() => {
     <div className="p-4 h-full flex flex-col gap-4">
       <div className="flex justify-between items-center">
         <h1 className="text-2xl font-bold">Заявки</h1>
+        <SaveExcelButton dataType="forms" url={`http://localhost:5000/api/forms?page=${currentPage}&limit=10000&sortField=${sortConfig.key}&sortOrder=${sortConfig.order}&selectedParks=${selectedParks.join(",")}&filterName=${name}&filterStartDate=${startDate}&filterEndDate=${endDate}`} />
       </div>
 
       <div className="overflow-auto flex-1">
@@ -172,7 +184,7 @@ const FormTable: React.FC<FormTableProps> = memo(() => {
                     <BiSortAlt2 fontSize="20px" />
                   )}
                 </div>
-                <input placeholder="Имя" className="w-full p-2" onChange={handleNameInputChange} />
+                <input placeholder="Имя" className="w-full p-2 font-normal" onChange={handleNameInputChange} />
               </th>
               <th className="border border-gray-300 px-4 py-2 w-96">
                 <div
@@ -234,6 +246,28 @@ const FormTable: React.FC<FormTableProps> = memo(() => {
                   ) : (
                     <BiSortAlt2 fontSize="20px" />
                   )}
+                </div>
+                <div className="flex gap-4 justify-center items-center">
+                  <div className="flex gap-2 items-center">
+                    <span>С</span>
+                    <input
+                      onChange={(e) => debouncedSetFilterStartDate(e.target.value)}
+                      type="date"
+                      max={endDate}
+                      className="border rounded-md px-2 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-blue-400"
+                      value={startDate}
+                    />
+                  </div>
+                  <div className="flex gap-2 items-center">
+                    <span>До</span>
+                    <input
+                      onChange={(e) => debouncedSetFilterEndDate(e.target.value)}
+                      type="date"
+                      min={calculateMinEndDate(startDate)}
+                      className="border rounded-md px-2 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-blue-400"
+                      value={endDate}
+                    />
+                  </div>
                 </div>
               </th>
             </tr>
