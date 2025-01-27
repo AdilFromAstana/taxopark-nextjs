@@ -64,12 +64,12 @@ const HowItWorks = () => {
 
   return (
     <section
-      className={`py-12 text-center transform transition-all duration-700 ease-in-out ${
+      className={`p-5 text-center transform transition-all duration-700 ease-in-out ${
         isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-12"
       }`}
       ref={sectionRef}
     >
-      <div className="mx-auto max-w-[1400px]">
+      <div className="mx-auto max-w-[1400px] text-center">
         <div className="mb-8">
           <h2 className="text-3xl font-bold text-gray-800">
             Как это работает?
@@ -78,13 +78,13 @@ const HowItWorks = () => {
             4 простых шага, чтобы начать зарабатывать!
           </p>
         </div>
-        <div className="flex flex-wrap justify-center gap-10">
+        <div className="flex flex-wrap justify-between items-center gap-10">
           {steps.map((step) => (
             <div
               key={step.number}
-              className="relative bg-[#f9f9f9] border border-gray-200 rounded-lg shadow-md p-6 w-full md:w-[calc(100%/2-80px)] lg:w-[calc(100%/2-40px)] aspect-[2.2/1] overflow-hidden"
+              className="relative bg-[#f9f9f9] border border-gray-200 rounded-lg shadow-md p-5 w-full md:w-[calc(50%-20px)] lg:w-[calc(50%-20px)] md:aspect-[2.2/1] aspect-[2.4/1] overflow-hidden"
             >
-              <div className="absolute top-4 left-4 bg-gray-100 text-gray-800 rounded-full w-10 h-10 flex items-center justify-center font-semibold">
+              <div className="absolute top-4 left-4 bg-gray-100 border border-black text-gray-800 rounded-full w-10 h-10 flex items-center justify-center font-semibold">
                 {step.number}
               </div>
               <Image
@@ -98,8 +98,8 @@ const HowItWorks = () => {
                     : `${stepImageStyle} h-3/4 right-0`
                 }
               />
-              <div className="w-1/2 flex h-full flex-col justify-center gap-[10px]">
-                <h3 className="text-2xl font-semibold text-gray-700 m-0">
+              <div className="ml-[5vw] w-3/5 md:w-1/2 flex h-full flex-col justify-center gap-[10px]">
+                <h3 className="text-xl md:text-2xl font-semibold text-black m-0">
                   {step.title}
                 </h3>
                 <p className="text-gray-600 m-0 text-base">

@@ -19,10 +19,12 @@ export interface Park {
     id: string;
     title: string;
   };
+  createdAt: string; // Дата создания записи
+  updatedAt: string; // Дата последнего обновления записи
 }
 
 export interface ParkInCarousel extends Park {
-  approximateIncome: number
+  approximateIncome: number;
 }
 
 export interface Form {
@@ -81,6 +83,6 @@ export interface GetFormsParams {
 }
 
 export interface SaveExcelButtonProps {
-  url: string
-  dataType: 'parks' | 'forms'
+  url: string;
+  dataType: "parks" | "forms";
 }

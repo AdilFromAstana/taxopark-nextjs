@@ -59,7 +59,7 @@ const Advantages = () => {
   return (
     <section
       ref={sectionRef}
-      className={`py-12 text-center transform transition-all duration-700 ease-in-out ${
+      className={`py-10 px-5 text-center transform transition-all duration-700 ease-in-out ${
         isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-12"
       }`}
     >
@@ -72,13 +72,13 @@ const Advantages = () => {
           комиссии, моментальные выплаты, акции и бонусы — всё для вашего
           удобства.
         </p>
-        <div className="flex flex-wrap justify-center gap-6">
+        <div className="flex flex-wrap justify-center gap-5">
           {advantages.map((adv, index) => (
             <div
               key={index}
-              className="bg-white border border-gray-200 rounded-lg shadow-md p-6 w-full sm:w-[calc(50%-1rem)] lg:w-[calc(33%-40px)] aspect-[1.6/1] transition-transform transform hover:translate-y-[-5px] hover:shadow-lg"
+              className="bg-white border border-gray-200 rounded-lg shadow-md p-6 w-full sm:w-[calc(50%-1rem)] lg:w-[calc(33%-40px)] lg:aspect-[1.6/1] aspect-[2.4/1] transition-transform transform hover:translate-y-[-5px] hover:shadow-lg"
             >
-              <div className="text-4xl mb-4 text-orange-500">{adv.icon}</div>
+              <div className="text-5xl mb-4 text-orange-500">{adv.icon}</div>
               <h3 className="text-xl font-semibold text-gray-700">
                 {adv.title}
               </h3>

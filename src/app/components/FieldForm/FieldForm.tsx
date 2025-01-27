@@ -11,22 +11,20 @@ const FieldForm = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
 
   return (
-    <div className="w-full bg-gray-100 py-12">
-      <div className="container mx-auto px-6 flex flex-wrap justify-between gap-10">
-        {/* Левый блок */}
-        <div className="flex-1 max-w-lg">
-          <h1 className="text-3xl font-bold text-gray-800 mb-4">
+    <div className="w-full bg-yellow-400 py-12">
+      <div className="container mx-auto px-6 flex justify-between gap-10 flex-col md:flex-row">
+        <div className="flex-1 max-w-lg flex flex-col items-center">
+          <h1 className="text-3xl font-bold text-gray-800 text-center mb-4">
             Выбирай лучший ТаксоПарк!
           </h1>
-          <p className="text-lg text-gray-600">
+          <p className="text-lg text-gray-600 text-center">
             Сравнивайте и выбирайте лучшие условия для работы!
           </p>
         </div>
 
-        {/* Правый блок (Форма) */}
-        <div className="flex-1 max-w-lg bg-white rounded-lg shadow-md p-6">
-          <h2 className="text-2xl font-semibold text-gray-800 mb-6">
-            Получить консультацию!
+        <div className="flex-1 bg-white max-w-lg rounded-xl shadow-md p-6">
+          <h2 className="text-2xl font-semibold text-gray-800 mb-6 text-center">
+            Бесплатная консультация!
           </h2>
           <form
             className="space-y-4"

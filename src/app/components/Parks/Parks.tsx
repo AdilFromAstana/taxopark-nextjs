@@ -1,13 +1,21 @@
 "use client";
 
-import React, { memo, useEffect, useState } from "react";
+import React, { memo, useCallback, useEffect, useState } from "react";
 import CreatePark from "./component/CreatePark";
 import UpdatePark from "./component/UpdatePark";
-import { GetParks, Notification, Park, SortOrder } from "@/app/interfaces/interfaces";
+import {
+  GetParks,
+  Notification,
+  Park,
+  SortOrder,
+} from "@/app/interfaces/interfaces";
 // import { LuFilter } from "react-icons/lu";
 import { BiSortAlt2 } from "react-icons/bi";
 import { GoSortAsc, GoSortDesc } from "react-icons/go";
 import NotificationBar from "../NotificationBar/NotificationBar";
+import SaveExcelButton from "../SaveExcelButton/SaveExcelButton";
+import { debounce } from "@/app/common/common";
+import ModalDropdown from "./component/ModalDropdown";
 
 interface TaxiParkTableProps {
   cities: any[];
@@ -26,6 +34,40 @@ const TaxiParkTable: React.FC<TaxiParkTableProps> = memo(({ cities }) => {
   const [isViewEditModalOpen, setIsViewEditModalOpen] =
     useState<boolean>(false);
 
+  const [selectedCity, setSelectedCity] = useState<string>("");
+  const [title, setTitle] = useState<string>("");
+  const [yandexGasStation, setYandexGasStation] = useState<
+    boolean | null | undefined
+  >(null);
+
+  const debouncedSetFilterCity = useCallback(
+    debounce((value: string) => {
+      setSelectedCity(value);
+      fetchData({ filteredCity: value });
+    }, 700),
+    []
+  );
+
+  const debouncedSetFilterTitle = useCallback(
+    debounce((value: string) => {
+      setTitle(value);
+      fetchData({ filteredTitle: value });
+    }, 700),
+    []
+  );
+
+  const debouncedSetFilterYandexGasStation = useCallback(
+    debounce((value: boolean | null | undefined) => {
+      setYandexGasStation(value);
+      fetchData({ filteredYandexGasStation: value });
+    }, 700),
+    []
+  );
+
+  const handleTitleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    debouncedSetFilterTitle(e.target.value);
+  };
+
   const [sortConfig, setSortConfig] = useState<{
     key: keyof Park | null;
     order: SortOrder;
@@ -38,8 +80,8 @@ const TaxiParkTable: React.FC<TaxiParkTableProps> = memo(({ cities }) => {
           ? prevConfig.order === "asc"
             ? "desc"
             : prevConfig.order === "desc"
-              ? null
-              : "asc"
+            ? null
+            : "asc"
           : "asc";
 
       return { key, order: newOrder };
@@ -52,19 +94,15 @@ const TaxiParkTable: React.FC<TaxiParkTableProps> = memo(({ cities }) => {
     setIsViewEditModalOpen(true);
   };
 
-  const handleArchiveRecord = (id: string) => {
-    setParks((prevData) =>
-      prevData.map((item) =>
-        item.id === id ? { ...item, archived: true } : item
-      )
-    );
-  };
-
-  const fetchData = async () => {
+  const fetchData = async ({
+    filteredTitle = title,
+    filteredCity = selectedCity,
+    filteredYandexGasStation = yandexGasStation,
+  }) => {
     try {
       setIsLoading(true);
       const response = await fetch(
-        `http://localhost:5000/api/parks?page=${currentPage}&limit=${limit}&sortField=${sortConfig.key}&sortOrder=${sortConfig.order}`
+        `http://localhost:5000/api/parks?page=${currentPage}&limit=${limit}&sortField=${sortConfig.key}&sortOrder=${sortConfig.order}&filteredCity=${filteredCity}&filteredTitle=${filteredTitle}&filteredYandexGasStation=${filteredYandexGasStation}`
       );
       const result: GetParks = await response.json();
       setParks(result.parks);
@@ -77,19 +115,25 @@ const TaxiParkTable: React.FC<TaxiParkTableProps> = memo(({ cities }) => {
   };
 
   useEffect(() => {
-    fetchData();
+    fetchData({});
   }, [currentPage, limit, sortConfig]);
 
   return (
     <div className="p-4 h-full flex flex-col gap-4">
       <div className="flex justify-between items-center">
-        <h1 className="text-2xl font-bold">Таксопарки</h1>
-        <button
-          className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 transition duration-200"
-          onClick={() => setIsCreateModalOpen(true)}
-        >
-          Добавить таксопарк
-        </button>
+        <div className="flex items-center gap-2">
+          <h1 className="text-2xl font-bold">Таксопарки</h1>
+          <button
+            className="bg-blue-500 text-white px-2 rounded hover:bg-blue-600 transition duration-200 text-xl"
+            onClick={() => setIsCreateModalOpen(true)}
+          >
+            +
+          </button>
+        </div>
+        <SaveExcelButton
+          dataType="parks"
+          url={`http://localhost:5000/api/parks?page=${currentPage}&limit=${limit}&sortField=${sortConfig.key}&sortOrder=${sortConfig.order}&filteredCity=${selectedCity}&filteredTitle=${title}&filteredYandexGasStation=${yandexGasStation}`}
+        />
       </div>
 
       <div className="overflow-auto">
@@ -118,6 +162,12 @@ const TaxiParkTable: React.FC<TaxiParkTableProps> = memo(({ cities }) => {
                     <BiSortAlt2 fontSize="20px" />
                   )}
                 </div>
+                <input
+                  type="text"
+                  placeholder="Название таксопарка"
+                  onChange={handleTitleInputChange}
+                  className="w-full border border-gray-300 rounded-lg p-2 font-normal"
+                />
               </th>
               <th className="border border-gray-300 px-4 py-2">
                 <div
@@ -134,6 +184,19 @@ const TaxiParkTable: React.FC<TaxiParkTableProps> = memo(({ cities }) => {
                   ) : (
                     <BiSortAlt2 fontSize="20px" />
                   )}
+                </div>
+                <div className="w-full">
+                  <select
+                    className="w-full border border-gray-300 rounded-lg p-2"
+                    onChange={(e) => debouncedSetFilterCity(e.target.value)}
+                  >
+                    <option value="">Все города</option>
+                    {cities.map((city) => (
+                      <option key={city.id} value={city.id}>
+                        {city.title}
+                      </option>
+                    ))}
+                  </select>
                 </div>
               </th>
               <th className="border border-gray-300 px-4 py-2">
@@ -154,9 +217,17 @@ const TaxiParkTable: React.FC<TaxiParkTableProps> = memo(({ cities }) => {
                 </div>
               </th>
               <th className="border border-gray-300 px-4 py-2">
-                Яндекс заправки
+                <div>Яндекс заправки</div>
+                <ModalDropdown
+                  label=""
+                  onChange={(value) => {
+                    if (value !== undefined) {
+                      debouncedSetFilterYandexGasStation(value);
+                    }
+                  }}
+                />
               </th>
-              <th className="border border-gray-300 px-4 py-2">Действия</th>
+              <th className="border border-gray-300 px-4 py-2">Статус</th>
             </tr>
           </thead>
           <tbody>
@@ -182,12 +253,15 @@ const TaxiParkTable: React.FC<TaxiParkTableProps> = memo(({ cities }) => {
                   {item.yandexGasStation ? "Да" : "Нет"}
                 </td>
                 <td className="border border-gray-300 px-4 py-2 text-center space-x-2">
-                  <button
-                    className="bg-red-500 text-white px-2 py-1 rounded hover:bg-red-600 transition duration-200"
-                    onClick={() => handleArchiveRecord(item.id)}
-                  >
-                    Архивировать
-                  </button>
+                  {item.active ? (
+                    <span className="bg-green-500 text-white px-2 py-1 rounded hover:bg-green-600 transition duration-200">
+                      Активный
+                    </span>
+                  ) : (
+                    <span className="bg-red-500 text-white px-2 py-1 rounded hover:bg-red-600 transition duration-200">
+                      В архиве
+                    </span>
+                  )}
                 </td>
               </tr>
             ))}

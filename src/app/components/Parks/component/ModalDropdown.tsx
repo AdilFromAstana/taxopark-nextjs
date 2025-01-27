@@ -1,10 +1,10 @@
 import React from "react";
 
 interface DropdownProps {
-  label: string; // Название поля (отображаемое пользователю)
-  value: boolean | null | undefined; // Текущее значение (true, false или null)
-  onChange: (value: boolean | null | undefined) => void; // Функция изменения значения
-  disabled?: boolean; // Флаг активности поля
+  label: string;
+  value?: boolean | null | undefined;
+  onChange: (value: boolean | null | undefined) => void;
+  disabled?: boolean;
 }
 
 const ModalDropdown: React.FC<DropdownProps> = ({
@@ -21,14 +21,16 @@ const ModalDropdown: React.FC<DropdownProps> = ({
         style={{
           backgroundColor: disabled ? "rgba(239, 239, 239, 0.3)" : "white",
         }}
-        value={typeof value === "boolean" ? value.toString() : ""} // Преобразуем boolean в строку
+        value={
+          value !== undefined && value !== null ? value.toString() : undefined
+        }
         disabled={disabled}
         onChange={(e) => {
           const newValue = e.target.value;
           if (newValue === "") {
-            onChange(null); // Если ничего не выбрано, возвращаем null
+            onChange(null);
           } else {
-            onChange(newValue === "true"); // Преобразуем строку обратно в boolean
+            onChange(newValue === "true");
           }
         }}
       >

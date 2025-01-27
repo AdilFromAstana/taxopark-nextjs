@@ -59,22 +59,22 @@ const Reviews = () => {
       }`}
       ref={sectionRef}
     >
-      <div className="container mx-auto">
+      <div className="container mx-auto p-5">
         <h2 className="text-3xl font-bold text-gray-800 mb-6">Отзывы</h2>
         <div className="flex flex-wrap justify-center gap-6">
           {reviews.map((review) => (
             <div
               key={review.id}
-              className="w-full max-w-xs bg-white border border-gray-200 rounded-lg shadow-md p-6 text-center flex flex-col items-center"
+              className="w-full md:max-w-xs bg-white border border-gray-200 rounded-lg shadow-md p-6 text-center flex flex-col items-center"
             >
               <Image
-                width={100}
-                height={100}
+                width={1000}
+                height={1000}
                 src={
                   "https://www.eg.ru/wp-content/uploads/2024/07/tyuremnye-sroki-lyubov-so-zvezdoy-doma-2-i-jizn-v-rossii-chto-stalo-so-zvezdoy-taksi-sami-naseri.jpg"
                 }
                 alt={review.name}
-                className="rounded-full mb-4 h-full"
+                className="rounded-full mb-4 md:h-32 md:w-32 w-20 h-20"
               />
               <h3 className="text-lg font-bold text-gray-700 mb-2">
                 {review.name}

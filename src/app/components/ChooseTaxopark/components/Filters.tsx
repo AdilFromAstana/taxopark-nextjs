@@ -20,7 +20,7 @@ interface FiltersProps {
   setFilteredItems: React.Dispatch<React.SetStateAction<unknown[]>>;
   setTotalRecords: React.Dispatch<React.SetStateAction<number>>;
   setIsLoading: React.Dispatch<React.SetStateAction<boolean>>;
-  cities: City[]
+  cities: City[];
 }
 
 const Filters: React.FC<FiltersProps> = memo(
@@ -38,7 +38,7 @@ const Filters: React.FC<FiltersProps> = memo(
     ) => {
       setSupportTimeFilters((prevFilters) => ({
         ...prevFilters,
-        [filterType]: !prevFilters[filterType], // Переключаем состояние выбранного фильтра
+        [filterType]: !prevFilters[filterType],
       }));
     };
 
@@ -65,8 +65,8 @@ const Filters: React.FC<FiltersProps> = memo(
             ...park,
             approximateIncome:
               workDays * orderPerDay * Number(park.averageCheck) -
-              ((yandexCommission + Number(park.parkCommission)) *
-                ((workDays * orderPerDay * Number(park.averageCheck)) / 100)),
+              (yandexCommission + Number(park.parkCommission)) *
+                ((workDays * orderPerDay * Number(park.averageCheck)) / 100),
             // (yandexCommission + park.parkCommission)
           };
         });
@@ -208,7 +208,9 @@ const Filters: React.FC<FiltersProps> = memo(
                         setParkPromotions([...parkPromotions, promotion.value]);
                       } else {
                         setParkPromotions(
-                          parkPromotions.filter((item) => item !== promotion.value)
+                          parkPromotions.filter(
+                            (item) => item !== promotion.value
+                          )
                         );
                       }
                     }}
@@ -218,7 +220,6 @@ const Filters: React.FC<FiltersProps> = memo(
                 </label>
               ))}
             </div>
-
           </div>
 
           {/* Город */}

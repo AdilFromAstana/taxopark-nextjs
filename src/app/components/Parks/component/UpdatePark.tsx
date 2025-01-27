@@ -90,6 +90,41 @@ const UpdatePark: React.FC<UpdateParkProps> = memo(
       setEndTime(value);
     };
 
+    const changeStatus = async () => {
+      try {
+        setIsLoading(true);
+        const response = await axios.put(
+          `http://localhost:5000/api/parks/${selectedRecord.id}`,
+          { active: !selectedRecord.active }
+        );
+        const updatedPark = response.data;
+        setParks((prevParks) =>
+          prevParks.map((park) =>
+            park.id === selectedRecord.id ? { ...park, ...updatedPark } : park
+          )
+        );
+        setSelectedRecord({
+          ...selectedRecord,
+          active: updatedPark.active,
+        });
+        addNotification({
+          type: "success",
+          message: `Таксопарк ${
+            updatedPark.active ? "активирован" : "архивирован"
+          }!`,
+        });
+      } catch (error: any) {
+        console.error("Ошибка при обновлении парка:", error);
+        addNotification({
+          type: "error",
+          message:
+            error.message || "Произошла ошибка при добавлении таксопарка",
+        });
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
     const updatePark = async () => {
       if (selectedRecord) {
         try {
@@ -132,9 +167,11 @@ const UpdatePark: React.FC<UpdateParkProps> = memo(
           </div>
         )}
         <div className="bg-white rounded-lg shadow-lg w-[75vw] p-6">
-          <h2 className="text-xl font-bold mb-4">
-            {isEditMode ? "Редактировать таксопарк" : "Просмотр таксопарка"}
-          </h2>
+          <div className="flex mb-4 gap-2">
+            <h2 className="text-xl font-bold">
+              {isEditMode ? "Редактировать таксопарк" : "Просмотр таксопарка"}
+            </h2>
+          </div>
           <div className="space-y-4">
             <div className="grid grid-cols-3 gap-4">
               <TextInput
@@ -331,12 +368,29 @@ const UpdatePark: React.FC<UpdateParkProps> = memo(
                 </>
               ) : (
                 <>
-                  <button
-                    className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 transition duration-200"
-                    onClick={() => setIsEditMode(true)}
-                  >
-                    Редактировать
-                  </button>
+                  <div className="flex gap-2">
+                    <button
+                      className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 transition duration-200"
+                      onClick={() => setIsEditMode(true)}
+                    >
+                      Редактировать
+                    </button>
+                    {selectedRecord.active ? (
+                      <button
+                        className="bg-red-500 text-white px-2 py-1 rounded hover:bg-red-600 transition duration-200"
+                        onClick={changeStatus}
+                      >
+                        Архивировать
+                      </button>
+                    ) : (
+                      <button
+                        className="bg-green-500 text-white px-2 py-1 rounded hover:bg-green-600 transition duration-200"
+                        onClick={changeStatus}
+                      >
+                        Активировать
+                      </button>
+                    )}
+                  </div>
                   <button
                     className="bg-gray-500 text-white px-4 py-2 rounded hover:bg-gray-600 transition duration-200"
                     onClick={() => setIsViewEditModalOpen(false)}

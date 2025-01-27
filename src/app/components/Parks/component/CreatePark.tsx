@@ -3,7 +3,7 @@ import axios from "axios";
 import React, { memo, useState } from "react";
 import ModalDropdown from "./ModalDropdown";
 import MultiSelect from "./MultiSelect";
-import StarRating from "./StarRating";
+// import StarRating from "./StarRating";
 import TextInput from "./TextInput";
 
 interface CreateParkProps {
@@ -45,7 +45,7 @@ const CreatePark: React.FC<CreateParkProps> = memo(
       rating: null,
       supportWorkTime: null,
       yandexGasStation: null,
-      averageCheck: 0
+      averageCheck: 0,
     });
 
     const [startTime, setStartTime] = useState("");
