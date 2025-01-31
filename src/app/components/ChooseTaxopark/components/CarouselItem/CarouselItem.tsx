@@ -9,7 +9,7 @@ import FrontSide from "./FrontSide";
 const CarouselItem: React.FC<{
   item: ParkInCarousel;
   setCarouselDisabled: React.Dispatch<React.SetStateAction<boolean>>;
-  slidesToShow: number
+  slidesToShow: number;
 }> = memo(({ item, setCarouselDisabled, slidesToShow }) => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [flipped, setFlipped] = useState(false);
@@ -27,11 +27,10 @@ const CarouselItem: React.FC<{
 
   const toggleFlip = () => setFlipped(!flipped);
 
-
   return (
     <div
       style={{
-        width: `${100 / slidesToShow}%`
+        width: `${100 / slidesToShow}%`,
       }}
       className="flex-shrink-0 h-[650px] flex items-center justify-center p-2"
     >
@@ -40,16 +39,23 @@ const CarouselItem: React.FC<{
         style={{
           transformStyle: "preserve-3d",
           transform: flipped ? "rotateY(180deg)" : "",
-          perspective: "1000px"
+          perspective: "1000px",
         }}
       >
         <FrontSide item={item} toggleFlip={toggleFlip} openModal={openModal} />
 
         <BackSide item={item} toggleFlip={toggleFlip} openModal={openModal} />
       </div>
-      <ApplicationModal isOpen={isModalOpen} onClose={closeModal} formType="taxiPark" parkId={item.id} />
+      <ApplicationModal
+        isOpen={isModalOpen}
+        onClose={closeModal}
+        formType="taxiPark"
+        parkId={item.id}
+      />
     </div>
   );
 });
+
+CarouselItem.displayName = "CarouselItem";
 
 export default CarouselItem;

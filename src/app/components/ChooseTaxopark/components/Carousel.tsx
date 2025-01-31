@@ -33,6 +33,8 @@ const Carousel: React.FC<{ items: any[]; isLoading: boolean }> = ({
         getCardCount()
     );
 
+    console.log(carouselDisabled)
+
     const handleNext = () => {
         setCurrentIndex((prevIndex) =>
             Math.min(prevIndex + 1, items.length - slidesToShow)
