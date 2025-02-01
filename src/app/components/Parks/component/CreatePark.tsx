@@ -30,7 +30,7 @@ const CreatePark: React.FC<CreateParkProps> = memo(
     };
 
     const [newRecord, setNewRecord] = useState<
-      Omit<Park, "id" | "active" | "City">
+      Omit<Park, "id" | "active" | "City" | "createdAt" | "updatedAt">
     >({
       title: "",
       cityId: "",

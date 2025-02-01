@@ -3,7 +3,6 @@
 import React, { memo, useCallback, useEffect, useState } from "react";
 import {
   Form,
-  FormTableProps,
   GetForms,
   GetFormsParams,
   GetParks,
@@ -18,8 +17,7 @@ import MultiSelect from "../Parks/component/MultiSelect";
 import SaveExcelButton from "../SaveExcelButton/SaveExcelButton";
 import { debounce, formatPhoneNumber } from "@/app/common/common";
 
-const FormTable: React.FC<FormTableProps> = memo(() => {
-  console.log("RENDER");
+const FormTable: React.FC = memo(() => {
   const [selectedRecord, setSelectedRecord] = useState<Form | null>(null);
   const [totalRecords, setTotalRecords] = useState<number>(0);
   const [currentPage, setCurrentPage] = useState<number>(1);
@@ -46,8 +44,8 @@ const FormTable: React.FC<FormTableProps> = memo(() => {
           ? prevConfig.order === "asc"
             ? "desc"
             : prevConfig.order === "desc"
-            ? null
-            : "asc"
+              ? null
+              : "asc"
           : "asc";
 
       return { key, order: newOrder };
@@ -118,8 +116,7 @@ const FormTable: React.FC<FormTableProps> = memo(() => {
     try {
       setIsLoading(true);
       const response = await fetch(
-        `http://localhost:5000/api/forms?page=${currentPage}&limit=${limit}&sortField=${
-          sortConfig.key
+        `http://localhost:5000/api/forms?page=${currentPage}&limit=${limit}&sortField=${sortConfig.key
         }&sortOrder=${sortConfig.order}&selectedParks=${filteredParks.join(
           ","
         )}&filterName=${filterName}&filterStartDate=${filterStartDate}&filterEndDate=${filterEndDate}`
@@ -167,11 +164,10 @@ const FormTable: React.FC<FormTableProps> = memo(() => {
         <h1 className="text-2xl font-bold">Заявки</h1>
         <SaveExcelButton
           dataType="forms"
-          url={`http://localhost:5000/api/forms?page=${currentPage}&limit=10000&sortField=${
-            sortConfig.key
-          }&sortOrder=${sortConfig.order}&selectedParks=${selectedParks.join(
-            ","
-          )}&filterName=${name}&filterStartDate=${startDate}&filterEndDate=${endDate}`}
+          url={`http://localhost:5000/api/forms?page=${currentPage}&limit=10000&sortField=${sortConfig.key
+            }&sortOrder=${sortConfig.order}&selectedParks=${selectedParks.join(
+              ","
+            )}&filterName=${name}&filterStartDate=${startDate}&filterEndDate=${endDate}`}
         />
       </div>
 
@@ -319,13 +315,13 @@ const FormTable: React.FC<FormTableProps> = memo(() => {
                 <td className="border border-gray-300 px-4 py-2">
                   {item.createdAt
                     ? new Date(item.createdAt).toLocaleString("ru-RU", {
-                        year: "numeric",
-                        month: "long",
-                        day: "numeric",
-                        hour: "2-digit",
-                        minute: "2-digit",
-                        second: "2-digit",
-                      })
+                      year: "numeric",
+                      month: "long",
+                      day: "numeric",
+                      hour: "2-digit",
+                      minute: "2-digit",
+                      second: "2-digit",
+                    })
                     : "Нет данных"}
                 </td>
               </tr>

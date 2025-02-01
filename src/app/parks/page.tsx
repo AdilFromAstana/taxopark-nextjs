@@ -20,17 +20,17 @@ async function getCities() {
     }
 
     const cities = await response.json();
-    return cities;
+    return cities.data;
   } catch (error) {
     console.error("Ошибка при загрузке городов:", error);
 
     return {
-      cities: [], // Возвращаем пустой массив, если произошла ошибка
+      cities: [],
     };
   }
 }
 
 export default async function ParksPage() {
   const data = await getCities();
-  return <TaxiParkTable cities={data} />;
+  return <TaxiParkTable cities={data.cities} />;
 }

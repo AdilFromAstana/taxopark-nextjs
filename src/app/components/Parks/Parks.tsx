@@ -21,7 +21,8 @@ interface TaxiParkTableProps {
   cities: any[];
 }
 
-const TaxiParkTable: React.FC<TaxiParkTableProps> = memo(({ cities }) => {
+const TaxiParkTable: React.FC<TaxiParkTableProps> = memo(({ cities = [] }) => {
+  console.log("cities: ", cities)
   const [notifications, setNotifications] = useState<Notification[]>([]);
   const [isCreateModalOpen, setIsCreateModalOpen] = useState<boolean>(false);
   const [selectedRecord, setSelectedRecord] = useState<Park | null>(null);
@@ -80,8 +81,8 @@ const TaxiParkTable: React.FC<TaxiParkTableProps> = memo(({ cities }) => {
           ? prevConfig.order === "asc"
             ? "desc"
             : prevConfig.order === "desc"
-            ? null
-            : "asc"
+              ? null
+              : "asc"
           : "asc";
 
       return { key, order: newOrder };
