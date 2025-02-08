@@ -94,7 +94,7 @@ const UpdatePark: React.FC<UpdateParkProps> = memo(
       try {
         setIsLoading(true);
         const response = await axios.put(
-          `http://localhost:5000/api/parks/${selectedRecord.id}`,
+          `http://localhost:5000/parks/${selectedRecord.id}`,
           { active: !selectedRecord.active }
         );
         const updatedPark = response.data;
@@ -130,7 +130,7 @@ const UpdatePark: React.FC<UpdateParkProps> = memo(
         try {
           setIsLoading(true);
           const response = await axios.put(
-            `http://localhost:5000/api/parks/${selectedRecord.id}`,
+            `http://localhost:5000/parks/${selectedRecord.id}`,
             selectedRecord
           );
           const updatedPark = response.data;

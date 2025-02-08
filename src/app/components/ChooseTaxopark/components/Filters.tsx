@@ -57,7 +57,7 @@ const Filters: React.FC<FiltersProps> = memo(
       try {
         setIsLoading(true);
         const response = await fetch(
-          `http://localhost:5000/api/parks?page=1&limit=1000&cityId=${selectedCityId}&parkPromotions=${parkPromotions}`
+          `http://localhost:5000/parks?page=1&limit=1000&cityId=${selectedCityId}&parkPromotions=${parkPromotions}`
         );
         const result: GetParks = await response.json();
         const updatedParks = result.parks.map((park) => {

@@ -1,5 +1,5 @@
 import { Viewport } from "next";
-import FormTable from "../components/Forms/Forms";
+import FormTable from "../../components/Forms/Forms";
 
 export const viewport: Viewport = {
   width: "device-width",

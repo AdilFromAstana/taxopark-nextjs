@@ -4,16 +4,20 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 
 const AdminLayout = ({ children }: { children: React.ReactNode }) => {
-  const pathname = usePathname(); // Получение текущего пути
+  const pathname = usePathname();
 
   const menuItems = [
     {
       label: "Таксопарки",
-      link: "/parks",
+      link: "/admin/parks",
     },
     {
       label: "Заявки",
-      link: "/forms",
+      link: "/admin/forms",
+    },
+    {
+      label: "Акции и бонусы",
+      link: "/admin/promotions",
     },
   ];
 
@@ -32,11 +36,10 @@ const AdminLayout = ({ children }: { children: React.ReactNode }) => {
               key={index}
               href={pathname === item.link ? "#" : item.link}
               passHref
-              className={`block py-2 px-4 transition-all truncate ${
-                pathname === item.link
-                  ? "bg-gray-700 font-bold"
-                  : "hover:bg-gray-700"
-              }`}
+              className={`block py-2 px-4 transition-all truncate ${pathname === item.link
+                ? "bg-gray-700 font-bold"
+                : "hover:bg-gray-700"
+                }`}
               title={item.label}
               onClick={(e) => {
                 if (pathname === item.link) {

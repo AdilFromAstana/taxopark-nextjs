@@ -1,5 +1,5 @@
 import { Viewport } from "next";
-import TaxiParkTable from "../components/Parks/Parks";
+import TaxiParkTable from "../../components/Parks/Parks";
 
 export const viewport: Viewport = {
   width: "device-width",
@@ -8,7 +8,7 @@ export const viewport: Viewport = {
 
 async function getCities() {
   try {
-    const response = await fetch("http://localhost:5000/api/cities", {
+    const response = await fetch("http://localhost:5000/cities", {
       method: "GET",
       headers: {
         "Content-Type": "application/json",
@@ -20,17 +20,15 @@ async function getCities() {
     }
 
     const cities = await response.json();
-    return cities.data;
+    return cities;
   } catch (error) {
     console.error("Ошибка при загрузке городов:", error);
 
-    return {
-      cities: [],
-    };
+    return []
   }
 }
 
 export default async function ParksPage() {
   const data = await getCities();
-  return <TaxiParkTable cities={data.cities} />;
+  return <TaxiParkTable cities={data} />;
 }

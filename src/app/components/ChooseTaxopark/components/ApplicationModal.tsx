@@ -33,7 +33,7 @@ const ApplicationModal = memo(
     const createForm = async () => {
       try {
         const response = await axios.post(
-          "http://localhost:5000/api/forms",
+          "http://localhost:5000/forms",
           { phoneNumber: phone, name, formType, parkId },
           {
             headers: {

@@ -61,7 +61,7 @@ const FormTable: React.FC = memo(() => {
     try {
       setIsLoading(true);
       const response = await fetch(
-        `http://localhost:5000/api/parks?page=1&limit=1000`
+        `http://localhost:5000/parks?page=1&limit=1000`
       );
       const result: GetParks = await response.json();
 
@@ -116,7 +116,7 @@ const FormTable: React.FC = memo(() => {
     try {
       setIsLoading(true);
       const response = await fetch(
-        `http://localhost:5000/api/forms?page=${currentPage}&limit=${limit}&sortField=${sortConfig.key
+        `http://localhost:5000/forms?page=${currentPage}&limit=${limit}&sortField=${sortConfig.key
         }&sortOrder=${sortConfig.order}&selectedParks=${filteredParks.join(
           ","
         )}&filterName=${filterName}&filterStartDate=${filterStartDate}&filterEndDate=${filterEndDate}`
@@ -164,7 +164,7 @@ const FormTable: React.FC = memo(() => {
         <h1 className="text-2xl font-bold">Заявки</h1>
         <SaveExcelButton
           dataType="forms"
-          url={`http://localhost:5000/api/forms?page=${currentPage}&limit=10000&sortField=${sortConfig.key
+          url={`http://localhost:5000/forms?page=${currentPage}&limit=10000&sortField=${sortConfig.key
             }&sortOrder=${sortConfig.order}&selectedParks=${selectedParks.join(
               ","
             )}&filterName=${name}&filterStartDate=${startDate}&filterEndDate=${endDate}`}

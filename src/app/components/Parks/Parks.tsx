@@ -21,8 +21,7 @@ interface TaxiParkTableProps {
   cities: any[];
 }
 
-const TaxiParkTable: React.FC<TaxiParkTableProps> = memo(({ cities = [] }) => {
-  console.log("cities: ", cities)
+const TaxiParkTable: React.FC<TaxiParkTableProps> = memo(({ cities }) => {
   const [notifications, setNotifications] = useState<Notification[]>([]);
   const [isCreateModalOpen, setIsCreateModalOpen] = useState<boolean>(false);
   const [selectedRecord, setSelectedRecord] = useState<Park | null>(null);
@@ -103,7 +102,7 @@ const TaxiParkTable: React.FC<TaxiParkTableProps> = memo(({ cities = [] }) => {
     try {
       setIsLoading(true);
       const response = await fetch(
-        `http://localhost:5000/api/parks?page=${currentPage}&limit=${limit}&sortField=${sortConfig.key}&sortOrder=${sortConfig.order}&filteredCity=${filteredCity}&filteredTitle=${filteredTitle}&filteredYandexGasStation=${filteredYandexGasStation}`
+        `http://localhost:5000/parks?page=${currentPage}&limit=${limit}&sortField=${sortConfig.key}&sortOrder=${sortConfig.order}&filteredCity=${filteredCity}&filteredTitle=${filteredTitle}&filteredYandexGasStation=${filteredYandexGasStation}`
       );
       const result: GetParks = await response.json();
       setParks(result.parks);
@@ -133,7 +132,7 @@ const TaxiParkTable: React.FC<TaxiParkTableProps> = memo(({ cities = [] }) => {
         </div>
         <SaveExcelButton
           dataType="parks"
-          url={`http://localhost:5000/api/parks?page=${currentPage}&limit=${limit}&sortField=${sortConfig.key}&sortOrder=${sortConfig.order}&filteredCity=${selectedCity}&filteredTitle=${title}&filteredYandexGasStation=${yandexGasStation}`}
+          url={`http://localhost:5000/parks?page=${currentPage}&limit=${limit}&sortField=${sortConfig.key}&sortOrder=${sortConfig.order}&filteredCity=${selectedCity}&filteredTitle=${title}&filteredYandexGasStation=${yandexGasStation}`}
         />
       </div>
 

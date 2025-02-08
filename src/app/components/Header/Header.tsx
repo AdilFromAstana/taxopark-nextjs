@@ -1,104 +1,73 @@
 "use client";
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import Link from "next/link";
+import { usePathname } from "next/navigation";
 
 function Header() {
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
+  const pathname = usePathname();
+
+  useEffect(() => {
+    if (isDrawerOpen) {
+      document.body.style.overflow = "hidden";
+    } else {
+      document.body.style.overflow = "auto";
+    }
+  }, [isDrawerOpen]);
+
+  if (pathname.includes("admin")) return null;
 
   return (
-    <header className="bg-blue-500 text-white p-4">
-      <div className="flex items-center justify-between flex-wrap">
+    <header className="bg-gradient-to-r bg-blue-500 text-white p-4 shadow-md sticky top-0 z-50">
+      <div className="max-w-7xl mx-auto flex items-center justify-between">
         {/* Логотип */}
-        <div className="flex-1 text-left">
-          {/* <img src="/logo.png" alt="logo" className="w-36 h-auto" /> */}
+        <div className="flex-1">
+          <Link href="/" className="text-2xl font-bold tracking-wide">Лого</Link>
         </div>
 
-        {/* Контакты */}
-        <div className="hidden md:block flex-1 text-center">
-          <div className="flex flex-col gap-1">
-            <span className="text-sm">+7-776-777-77-77</span>
-            <span className="text-sm">Круглосуточно</span>
-          </div>
-        </div>
-
-        {/* Навигация */}
-        <nav className="hidden md:flex flex-3 justify-around">
-          <a href="#" className="text-white text-sm font-bold hover:underline">
-            Главная
-          </a>
-          <a href="#" className="text-white text-sm font-bold hover:underline">
-            Как это работает?
-          </a>
-          <a href="#" className="text-white text-sm font-bold hover:underline">
-            Акции и бонусы
-          </a>
-          <a href="#" className="text-white text-sm font-bold hover:underline">
-            Контакты
-          </a>
+        {/* Навигация (десктоп) */}
+        <nav className="hidden md:flex flex-1 justify-end space-x-6 text-sm font-medium">
+          <Link href="/" className="hover:text-gray-200 transition" onClick={() => setIsDrawerOpen(false)}>Главная</Link>
+          <Link href="/how-it-works" className="hover:text-gray-200 transition" onClick={() => setIsDrawerOpen(false)}>Как это работает?</Link>
+          <Link href="/promotions" className="hover:text-gray-200 transition" onClick={() => setIsDrawerOpen(false)}>Акции и бонусы</Link>
+          <Link href="tel:+77767777777" className="flex items-center gap-2 text-white hover:text-gray-300 transition">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="w-5 h-5">
+              <path d="M6.62 10.79a15.07 15.07 0 006.59 6.59l2.2-2.2a1 1 0 011.11-.23 11.36 11.36 0 003.64.61 1 1 0 011 1V21a1 1 0 01-1 1A19 19 0 013 5a1 1 0 011-1h3.5a1 1 0 011 1 11.36 11.36 0 00.61 3.64 1 1 0 01-.23 1.11z" />
+            </svg>
+          </Link>
         </nav>
 
-        {/* Кнопка регистрации */}
-        <div className="hidden md:block flex-1 text-right">
-          <button className="bg-white text-blue-500 font-bold py-2 px-4 rounded-full hover:bg-gray-200">
-            Зарегистрироваться
-          </button>
-        </div>
-
-        {/* Кнопка меню для мобильных */}
-        <div className="block md:hidden">
+        {/* Кнопка бургера (мобилка) */}
+        <div className="md:hidden">
           <button onClick={() => setIsDrawerOpen(true)}>
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              viewBox="0 0 24 24"
-              fill="currentColor"
-              className="w-8 h-8 text-white"
-            >
-              <path
-                fillRule="evenodd"
-                d="M3 5a1 1 0 011-1h16a1 1 0 110 2H4a1 1 0 01-1-1zM3 12a1 1 0 011-1h16a1 1 0 110 2H4a1 1 0 01-1-1zM3 19a1 1 0 011-1h16a1 1 0 110 2H4a1 1 0 01-1-1z"
-                clipRule="evenodd"
-              />
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="w-8 h-8">
+              <path fillRule="evenodd" d="M3 5a1 1 0 011-1h16a1 1 0 110 2H4a1 1 0 01-1-1zM3 12a1 1 0 011-1h16a1 1 0 110 2H4a1 1 0 01-1-1zM3 19a1 1 0 011-1h16a1 1 0 110 2H4a1 1 0 01-1-1z" clipRule="evenodd" />
             </svg>
           </button>
         </div>
       </div>
 
       {/* Мобильное меню */}
-      {isDrawerOpen && (
-        <div className="fixed inset-0 bg-black bg-opacity-75 z-50 flex flex-col p-4">
-          <button
-            className="self-end text-white text-2xl"
-            onClick={() => setIsDrawerOpen(false)}
-          >
-            ✕
-          </button>
-          <nav className="flex flex-col items-center mt-8 gap-4">
-            <a
-              href="#"
-              className="text-white text-lg font-bold hover:underline"
-            >
-              Главная
-            </a>
-            <a
-              href="#"
-              className="text-white text-lg font-bold hover:underline"
-            >
-              Как это работает?
-            </a>
-            <a
-              href="#"
-              className="text-white text-lg font-bold hover:underline"
-            >
-              Акции и бонусы
-            </a>
-            <a
-              href="#"
-              className="text-white text-lg font-bold hover:underline"
-            >
-              Контакты
-            </a>
-          </nav>
+      <div className={`gap-4 fixed inset-0 z-50 flex flex-col p-5 bg-blue-500 transition-transform duration-300 transform ${isDrawerOpen ? 'translate-x-0 opacity-100' : 'translate-x-full opacity-0'}`}>
+        <div className="flex justify-between align-middle w-full border-b-2 border-white pb-4">
+          <p className="text-lg font-bold text-white">MyCompany</p>
+          <button className="text-white text-2xl" onClick={() => setIsDrawerOpen(false)}>✕</button>
         </div>
-      )}
+        <nav className="flex flex-col items-start space-y-6 text-lg font-medium w-full">
+          <Link href="/" className="text-white flex items-center gap-2 hover:text-gray-300 transition" onClick={() => setIsDrawerOpen(false)}>
+            🏠 Главная
+          </Link>
+          <Link href="/how-it-works" className="text-white flex items-center gap-2 hover:text-gray-300 transition" onClick={() => setIsDrawerOpen(false)}>
+            ⚙️ Как это работает?
+          </Link>
+          <Link href="/promotions" className="text-white flex items-center gap-2 hover:text-gray-300 transition" onClick={() => setIsDrawerOpen(false)}>
+            🎁 Акции и бонусы
+          </Link>
+          <Link href="tel:+77767777777" className="flex items-center gap-2 text-white hover:text-gray-300 transition">
+            📞 +7-776-777-77-77
+          </Link>
+        </nav>
+      </div>
     </header>
   );
 }

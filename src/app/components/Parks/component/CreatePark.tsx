@@ -99,7 +99,7 @@ const CreatePark: React.FC<CreateParkProps> = memo(
       try {
         setIsLoading(true);
         const response = await axios.post(
-          "http://localhost:5000/api/parks",
+          "http://localhost:5000/parks",
           newRecord
         );
         const createdPark = response.data;
