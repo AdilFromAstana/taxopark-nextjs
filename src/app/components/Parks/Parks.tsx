@@ -102,7 +102,7 @@ const TaxiParkTable: React.FC<TaxiParkTableProps> = memo(({ cities }) => {
     try {
       setIsLoading(true);
       const response = await fetch(
-        `http://localhost:5000/parks?page=${currentPage}&limit=${limit}&sortField=${sortConfig.key}&sortOrder=${sortConfig.order}&filteredCity=${filteredCity}&filteredTitle=${filteredTitle}&filteredYandexGasStation=${filteredYandexGasStation}`
+        `http://188.94.156.86/api/parks?page=${currentPage}&limit=${limit}&sortField=${sortConfig.key}&sortOrder=${sortConfig.order}&filteredCity=${filteredCity}&filteredTitle=${filteredTitle}&filteredYandexGasStation=${filteredYandexGasStation}`
       );
       const result: GetParks = await response.json();
       setParks(result.parks);
@@ -132,7 +132,7 @@ const TaxiParkTable: React.FC<TaxiParkTableProps> = memo(({ cities }) => {
         </div>
         <SaveExcelButton
           dataType="parks"
-          url={`http://localhost:5000/parks?page=${currentPage}&limit=${limit}&sortField=${sortConfig.key}&sortOrder=${sortConfig.order}&filteredCity=${selectedCity}&filteredTitle=${title}&filteredYandexGasStation=${yandexGasStation}`}
+          url={`http://188.94.156.86/api/parks?page=${currentPage}&limit=${limit}&sortField=${sortConfig.key}&sortOrder=${sortConfig.order}&filteredCity=${selectedCity}&filteredTitle=${title}&filteredYandexGasStation=${yandexGasStation}`}
         />
       </div>
 

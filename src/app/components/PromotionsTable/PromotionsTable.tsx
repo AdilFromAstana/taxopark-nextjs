@@ -38,6 +38,14 @@ const PromotionsTable: React.FC<PromotionsTableProps> = memo(({ parks }) => {
         order: null,
     });
 
+    const debouncedSetParkId = useCallback(
+        debounce((value: string) => {
+            setParkId(value);
+            fetchData({ filteredParkId: value });
+        }, 700),
+        []
+    );
+
     const debouncedSetSearchTitle = useCallback(
         debounce((value: string) => {
             setSearchTitle(value);
@@ -61,11 +69,11 @@ const PromotionsTable: React.FC<PromotionsTableProps> = memo(({ parks }) => {
         });
     };
 
-    const fetchData = async ({ searchTitle = "" }) => {
+    const fetchData = async ({ filteredTitle = searchTitle, filteredParkId = parkId }) => {
         try {
             setIsLoading(true);
             const response = await fetch(
-                `http://localhost:5000/promotions?page=${currentPage}&limit=${limit}&sortField=${sortConfig.key}&sortOrder=${sortConfig.order}&searchTitle=${searchTitle}`
+                `http://188.94.156.86/api/promotions?page=${currentPage}&limit=${limit}&sortField=${sortConfig.key}&sortOrder=${sortConfig.order}&searchTitle=${filteredTitle}&filteredParkId=${filteredParkId}`
             );
             const result = await response.json();
             setPromotions(result.promotions);
@@ -97,7 +105,7 @@ const PromotionsTable: React.FC<PromotionsTableProps> = memo(({ parks }) => {
                 </div>
                 <SaveExcelButton
                     dataType="parks"
-                    url={`http://localhost:5000/parks?page=${currentPage}&limit=${limit}&sortField=${sortConfig.key}&sortOrder=${sortConfig.order}&parkId=${parkId}`}
+                    url={`http://188.94.156.86/api/parks?page=${currentPage}&limit=${limit}&sortField=${sortConfig.key}&sortOrder=${sortConfig.order}&parkId=${parkId}`}
                 />
             </div>
 
@@ -130,7 +138,7 @@ const PromotionsTable: React.FC<PromotionsTableProps> = memo(({ parks }) => {
                                     className="w-full border border-gray-300 rounded-lg p-2 font-normal"
                                 />
                             </th>
-                            <th className="border border-gray-300 px-4 py-2">Таксопарк</th>
+                            <th className="border border-gray-300 px-4 py-2" onClick={() => debouncedSetParkId('')}>Таксопарк</th>
                             <th className="border border-gray-300 px-4 py-2">Срок действия</th>
                             <th className="border border-gray-300 px-4 py-2">Статус</th>
                         </tr>

@@ -8,7 +8,7 @@ export const viewport: Viewport = {
 
 async function getParks() {
     try {
-        const response = await fetch("http://localhost:5000/parks", {
+        const response = await fetch("http://188.94.156.86/api/parks", {
             method: "GET",
             headers: {
                 "Content-Type": "application/json",

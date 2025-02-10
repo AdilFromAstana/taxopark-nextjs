@@ -35,7 +35,7 @@ const CreatePromotion: React.FC<CreatePromotionProps> = memo(
             try {
                 setIsLoading(true);
                 const response = await axios.post(
-                    "http://localhost:5000/promotions",
+                    "http://188.94.156.86/api/promotions",
                     newPromotion
                 );
                 const createdPromotion = response.data;

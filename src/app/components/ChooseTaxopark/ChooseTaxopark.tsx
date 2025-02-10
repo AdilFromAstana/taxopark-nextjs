@@ -16,7 +16,7 @@ const ChooseTaxopark = memo(() => {
 
   const getCities = async () => {
     try {
-      const response: { data: City[] } = await axios.get("http://localhost:5000/cities")
+      const response: { data: City[] } = await axios.get("http://188.94.156.86/api/cities")
       setCities(response.data)
     } catch (e) {
       console.error(e)
