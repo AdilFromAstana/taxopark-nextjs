@@ -17,6 +17,8 @@ import MultiSelect from "../Parks/component/MultiSelect";
 import SaveExcelButton from "../SaveExcelButton/SaveExcelButton";
 import { debounce, formatPhoneNumber } from "@/app/common/common";
 
+const API_URL = process.env.NEXT_PUBLIC_API_URL;
+
 const FormTable: React.FC = memo(() => {
   const [selectedRecord, setSelectedRecord] = useState<Form | null>(null);
   const [totalRecords, setTotalRecords] = useState<number>(0);
@@ -44,8 +46,8 @@ const FormTable: React.FC = memo(() => {
           ? prevConfig.order === "asc"
             ? "desc"
             : prevConfig.order === "desc"
-              ? null
-              : "asc"
+            ? null
+            : "asc"
           : "asc";
 
       return { key, order: newOrder };
@@ -60,12 +62,10 @@ const FormTable: React.FC = memo(() => {
   const getParks = async () => {
     try {
       setIsLoading(true);
-      const response = await fetch(
-        `http://188.94.156.86/api/parks?page=1&limit=1000`
-      );
+      const response = await fetch(`${API_URL}/parks?page=1&limit=1000`);
       const result: GetParks = await response.json();
 
-      setParks(result.parks);
+      setParks(result.data);
     } catch (error) {
       console.error("Ошибка при загрузке данных: ", error);
     } finally {
@@ -116,7 +116,8 @@ const FormTable: React.FC = memo(() => {
     try {
       setIsLoading(true);
       const response = await fetch(
-        `http://188.94.156.86/api/forms?page=${currentPage}&limit=${limit}&sortField=${sortConfig.key
+        `${API_URL}/forms?page=${currentPage}&limit=${limit}&sortField=${
+          sortConfig.key
         }&sortOrder=${sortConfig.order}&selectedParks=${filteredParks.join(
           ","
         )}&filterName=${filterName}&filterStartDate=${filterStartDate}&filterEndDate=${filterEndDate}`
@@ -124,7 +125,7 @@ const FormTable: React.FC = memo(() => {
       const result: GetForms = await response.json();
 
       setForms(
-        result.forms.map((form) => ({
+        result.data.map((form) => ({
           ...form,
           phoneNumber: formatPhoneNumber(form.phoneNumber),
         }))
@@ -164,10 +165,11 @@ const FormTable: React.FC = memo(() => {
         <h1 className="text-2xl font-bold">Заявки</h1>
         <SaveExcelButton
           dataType="forms"
-          url={`http://188.94.156.86/api/forms?page=${currentPage}&limit=10000&sortField=${sortConfig.key
-            }&sortOrder=${sortConfig.order}&selectedParks=${selectedParks.join(
-              ","
-            )}&filterName=${name}&filterStartDate=${startDate}&filterEndDate=${endDate}`}
+          url={`${API_URL}/forms?page=${currentPage}&limit=10000&sortField=${
+            sortConfig.key
+          }&sortOrder=${sortConfig.order}&selectedParks=${selectedParks.join(
+            ","
+          )}&filterName=${name}&filterStartDate=${startDate}&filterEndDate=${endDate}`}
         />
       </div>
 
@@ -315,13 +317,13 @@ const FormTable: React.FC = memo(() => {
                 <td className="border border-gray-300 px-4 py-2">
                   {item.createdAt
                     ? new Date(item.createdAt).toLocaleString("ru-RU", {
-                      year: "numeric",
-                      month: "long",
-                      day: "numeric",
-                      hour: "2-digit",
-                      minute: "2-digit",
-                      second: "2-digit",
-                    })
+                        year: "numeric",
+                        month: "long",
+                        day: "numeric",
+                        hour: "2-digit",
+                        minute: "2-digit",
+                        second: "2-digit",
+                      })
                     : "Нет данных"}
                 </td>
               </tr>

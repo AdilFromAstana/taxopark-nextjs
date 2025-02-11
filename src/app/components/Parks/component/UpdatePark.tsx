@@ -17,6 +17,8 @@ interface UpdateParkProps {
   setNotifications: React.Dispatch<React.SetStateAction<Notification[]>>;
 }
 
+const API_URL = process.env.NEXT_PUBLIC_API_URL;
+
 const UpdatePark: React.FC<UpdateParkProps> = memo(
   ({
     setIsViewEditModalOpen,
@@ -94,7 +96,7 @@ const UpdatePark: React.FC<UpdateParkProps> = memo(
       try {
         setIsLoading(true);
         const response = await axios.put(
-          `http://188.94.156.86/api/parks/${selectedRecord.id}`,
+          `${API_URL}/parks/${selectedRecord.id}`,
           { active: !selectedRecord.active }
         );
         const updatedPark = response.data;
@@ -130,7 +132,7 @@ const UpdatePark: React.FC<UpdateParkProps> = memo(
         try {
           setIsLoading(true);
           const response = await axios.put(
-            `http://188.94.156.86/api/parks/${selectedRecord.id}`,
+            `${API_URL}/parks/${selectedRecord.id}`,
             selectedRecord
           );
           const updatedPark = response.data;

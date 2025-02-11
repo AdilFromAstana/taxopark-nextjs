@@ -7,27 +7,28 @@ import Carousel from "./components/Carousel";
 import axios from "axios";
 import { City } from "@/app/interfaces/interfaces";
 
+const API_URL = process.env.NEXT_PUBLIC_API_URL;
+
 const ChooseTaxopark = memo(() => {
   const [filteredItems, setFilteredItems] = useState<unknown[]>([]);
   const [totalRecords, setTotalRecords] = useState(0);
   const [isLoading, setIsLoading] = useState(true);
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
-  const [cities, setCities] = useState<City[]>([])
+  const [cities, setCities] = useState<City[]>([]);
 
   const getCities = async () => {
     try {
-      const response: { data: City[] } = await axios.get("http://188.94.156.86/api/cities")
-      setCities(response.data)
+      const response: { data: City[] } = await axios.get(`${API_URL}/cities`);
+      setCities(response.data);
     } catch (e) {
-      console.error(e)
+      console.error(e);
     } finally {
-
     }
-  }
+  };
 
   useEffect(() => {
-    getCities()
-  }, [])
+    getCities();
+  }, []);
 
   return (
     <section className="flex flex-col items-center mt-10 mx-auto">

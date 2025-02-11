@@ -6,6 +6,8 @@ import ReactDOM from "react-dom";
 import PhoneInput from "react-phone-input-2";
 import "react-phone-input-2/lib/style.css";
 
+const API_URL = process.env.NEXT_PUBLIC_API_URL;
+
 const ApplicationModal = memo(
   ({
     isOpen,
@@ -33,7 +35,7 @@ const ApplicationModal = memo(
     const createForm = async () => {
       try {
         const response = await axios.post(
-          "http://188.94.156.86/api/forms",
+          `${API_URL}/forms`,
           { phoneNumber: phone, name, formType, parkId },
           {
             headers: {

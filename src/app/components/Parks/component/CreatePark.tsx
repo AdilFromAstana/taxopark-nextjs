@@ -13,6 +13,8 @@ interface CreateParkProps {
   setNotifications: React.Dispatch<React.SetStateAction<Notification[]>>;
 }
 
+const API_URL = process.env.NEXT_PUBLIC_API_URL;
+
 const CreatePark: React.FC<CreateParkProps> = memo(
   ({ setIsCreateModalOpen, cities, setParks, setNotifications }) => {
     const addNotification = (notification: Omit<Notification, "id">) => {
@@ -98,10 +100,7 @@ const CreatePark: React.FC<CreateParkProps> = memo(
     const createPark = async () => {
       try {
         setIsLoading(true);
-        const response = await axios.post(
-          "http://188.94.156.86/api/parks",
-          newRecord
-        );
+        const response = await axios.post(`${API_URL}/parks`, newRecord);
         const createdPark = response.data;
         if (!createdPark) {
           throw new Error("Некорректный ответ сервера");

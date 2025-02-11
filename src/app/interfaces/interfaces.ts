@@ -27,6 +27,21 @@ export interface ParkInCarousel extends Park {
   approximateIncome: number;
 }
 
+export interface Promotion {
+  id: number;
+  title: string;
+  taxiPark: string;
+  description: string;
+  startDate: string;
+  expires: string | null;
+  active: boolean;
+  park: {
+    title: string;
+    id: string;
+  };
+  createdAt: string;
+}
+
 export interface Form {
   id: string; // Уникальный идентификатор формы
   name: string; // Имя и фамилия отправителя формы
@@ -50,13 +65,21 @@ export interface ApiError {
 }
 
 export interface GetParks {
-  parks: Park[];
+  data: Park[];
   total: number;
   page: number;
   totalPages: number;
 }
 
 export type SortOrder = "asc" | "desc" | null;
+
+export type EntityType = "Promotion" | "Park" | "Form";
+
+export interface Field<T> {
+  key: keyof T | string;
+  label: string;
+  format?: (value: any) => string;
+}
 
 export interface Notification {
   id: string;
@@ -69,7 +92,7 @@ export interface FormTableProps {
 }
 
 export interface GetForms {
-  forms: Form[];
+  data: Form[];
   total: number;
   page: number;
   totalPages: number;

@@ -23,6 +23,8 @@ interface FiltersProps {
   cities: City[];
 }
 
+const API_URL = process.env.NEXT_PUBLIC_API_URL;
+
 const Filters: React.FC<FiltersProps> = memo(
   ({ setFilteredItems, setIsLoading, setTotalRecords, cities }) => {
     const [supportTimeFilters, setSupportTimeFilters] = useState<{
@@ -57,7 +59,7 @@ const Filters: React.FC<FiltersProps> = memo(
       try {
         setIsLoading(true);
         const response = await fetch(
-          `http://188.94.156.86/api/parks?page=1&limit=1000&cityId=${selectedCityId}&parkPromotions=${parkPromotions}`
+          `${API_URL}/parks?page=1&limit=1000&cityId=${selectedCityId}&parkPromotions=${parkPromotions}`
         );
         const result: GetParks = await response.json();
         const updatedParks = result.parks.map((park) => {

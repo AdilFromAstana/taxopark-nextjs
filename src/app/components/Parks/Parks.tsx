@@ -21,6 +21,8 @@ interface TaxiParkTableProps {
   cities: any[];
 }
 
+const API_URL = process.env.NEXT_PUBLIC_API_URL;
+
 const TaxiParkTable: React.FC<TaxiParkTableProps> = memo(({ cities }) => {
   const [notifications, setNotifications] = useState<Notification[]>([]);
   const [isCreateModalOpen, setIsCreateModalOpen] = useState<boolean>(false);
@@ -80,8 +82,8 @@ const TaxiParkTable: React.FC<TaxiParkTableProps> = memo(({ cities }) => {
           ? prevConfig.order === "asc"
             ? "desc"
             : prevConfig.order === "desc"
-              ? null
-              : "asc"
+            ? null
+            : "asc"
           : "asc";
 
       return { key, order: newOrder };
@@ -102,10 +104,10 @@ const TaxiParkTable: React.FC<TaxiParkTableProps> = memo(({ cities }) => {
     try {
       setIsLoading(true);
       const response = await fetch(
-        `http://188.94.156.86/api/parks?page=${currentPage}&limit=${limit}&sortField=${sortConfig.key}&sortOrder=${sortConfig.order}&filteredCity=${filteredCity}&filteredTitle=${filteredTitle}&filteredYandexGasStation=${filteredYandexGasStation}`
+        `${API_URL}/parks?page=${currentPage}&limit=${limit}&sortField=${sortConfig.key}&sortOrder=${sortConfig.order}&filteredCity=${filteredCity}&filteredTitle=${filteredTitle}&filteredYandexGasStation=${filteredYandexGasStation}`
       );
       const result: GetParks = await response.json();
-      setParks(result.parks);
+      setParks(result.data);
       setTotalRecords(result.totalPages);
     } catch (error) {
       console.error("Ошибка при загрузке данных: ", error);
@@ -132,7 +134,7 @@ const TaxiParkTable: React.FC<TaxiParkTableProps> = memo(({ cities }) => {
         </div>
         <SaveExcelButton
           dataType="parks"
-          url={`http://188.94.156.86/api/parks?page=${currentPage}&limit=${limit}&sortField=${sortConfig.key}&sortOrder=${sortConfig.order}&filteredCity=${selectedCity}&filteredTitle=${title}&filteredYandexGasStation=${yandexGasStation}`}
+          url={`${API_URL}/parks?page=${currentPage}&limit=${limit}&sortField=${sortConfig.key}&sortOrder=${sortConfig.order}&filteredCity=${selectedCity}&filteredTitle=${title}&filteredYandexGasStation=${yandexGasStation}`}
         />
       </div>
 

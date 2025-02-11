@@ -1,33 +1,49 @@
-import PromotionsTable from "@/app/components/PromotionsTable/PromotionsTable";
-import { Viewport } from "next";
+"use client";
+import { fetchDataAPI } from "@/app/api";
+import DataTable from "@/app/components/DataTable";
+import { Promotion } from "@/app/interfaces/interfaces";
 
-export const viewport: Viewport = {
-    width: "device-width",
-    userScalable: false,
-};
+const API_URL = process.env.NEXT_PUBLIC_API_URL;
 
-async function getParks() {
-    try {
-        const response = await fetch("http://188.94.156.86/api/parks", {
-            method: "GET",
-            headers: {
-                "Content-Type": "application/json",
-            },
-        });
-
-        if (!response.ok) {
-            throw new Error("Не удалось загрузить данные о городах");
-        }
-
-        const data = await response.json();
-        return data.parks;
-    } catch (error) {
-        console.error("Ошибка при загрузке городов:", error);
-        return []
-    }
-}
-
-export default async function PromotionsPage() {
-    const data = await getParks();
-    return <PromotionsTable parks={data} />;
+export default function PromotionsPage() {
+  return (
+    <DataTable
+      columns={[
+        {
+          key: "title",
+          label: "Название акции",
+          sortable: true,
+          filterable: true,
+          filterType: "text",
+        },
+        {
+          key: ["park", "title"],
+          label: "Парк",
+          sortable: true,
+          filterable: true,
+        },
+        {
+          key: "createdAt",
+          label: "Создано",
+          sortable: true,
+          filterable: true,
+          filterType: "dateRange",
+          render: (value) =>
+            new Date(value).toLocaleString("ru-RU", {
+              year: "numeric",
+              month: "long",
+              day: "numeric",
+              hour: "2-digit",
+              minute: "2-digit",
+            }),
+        },
+      ]}
+      fetchData={(params) =>
+        fetchDataAPI<Promotion>({
+          apiEndpoint: `${API_URL}/promotions`,
+          ...params,
+        })
+      }
+    />
+  );
 }
