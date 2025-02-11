@@ -6,7 +6,7 @@ import { GoSortAsc, GoSortDesc } from "react-icons/go";
 import { debounce } from "@/app/common/common";
 import MultiSelect from "./Parks/component/MultiSelect";
 import UpdateModal from "./UpdateModal";
-import { Form, Park, Promotion } from "../interfaces/interfaces";
+import { EntityType, EntityWithStatus } from "../interfaces/interfaces";
 
 interface ColumnConfig {
   key: string | string[];
@@ -28,6 +28,7 @@ interface FetchParams {
 interface DataTableProps {
   columns: ColumnConfig[];
   fetchData: (params: FetchParams) => Promise<{ data: any[]; total: number }>;
+  selectedItem: EntityType
 }
 
 const getNestedValue = (
@@ -41,23 +42,19 @@ const getNestedValue = (
   );
 };
 
-const DataTable: React.FC<DataTableProps> = memo(({ columns, fetchData }) => {
+const DataTable: React.FC<DataTableProps> = memo(({ columns, fetchData, selectedItem }) => {
   const [data, setData] = useState<any[]>([]);
+  const [isViewEditModalOpen, setIsViewEditModalOpen] = useState<boolean>(false);
   const [isCreateModalOpen, setIsCreateModalOpen] = useState<boolean>(false);
   const [selectedRecord, setSelectedRecord] = useState<
-    Form | Park | Promotion
+    EntityWithStatus
   >();
   const [totalRecords, setTotalRecords] = useState<number>(0);
   const [currentPage, setCurrentPage] = useState<number>(1);
   const [limit, setLimit] = useState<number>(10);
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [filters, setFilters] = useState<Record<string, any>>({});
-  const [isViewEditModalOpen, setIsViewEditModalOpen] =
-    useState<boolean>(false);
-  const [sortConfig, setSortConfig] = useState<{
-    key: string | string[] | null;
-    order: "asc" | "desc" | null;
-  }>({
+  const [sortConfig, setSortConfig] = useState<{ key: string | string[] | null; order: "asc" | "desc" | null }>({
     key: null,
     order: null,
   });
@@ -75,17 +72,17 @@ const DataTable: React.FC<DataTableProps> = memo(({ columns, fetchData }) => {
         setIsLoading(false);
       }
     }, 500),
-    []
+    [fetchData, selectedItem]
   );
 
   useEffect(() => {
     debouncedFetchData({
-      page: currentPage,
+      page: 1,
       limit,
       sort: sortConfig,
-      filters,
+      filters: {},
     });
-  }, [currentPage, limit, sortConfig, filters]);
+  }, [selectedItem]);
 
   const handleSort = (key: string | string[]) => {
     setSortConfig((prev) => ({
@@ -172,7 +169,7 @@ const DataTable: React.FC<DataTableProps> = memo(({ columns, fetchData }) => {
                         options={col.filterOptions}
                         values={
                           filters[
-                            Array.isArray(col.key) ? col.key.join(".") : col.key
+                          Array.isArray(col.key) ? col.key.join(".") : col.key
                           ] || []
                         }
                         onChange={(values) =>
@@ -230,8 +227,7 @@ const DataTable: React.FC<DataTableProps> = memo(({ columns, fetchData }) => {
                 key={item.id}
                 className="hover:bg-gray-50"
                 onClick={() => {
-                  console.log("item: ", item);
-                  setSelectedRecord(item);
+                  setSelectedRecord({ ...item, entityType: selectedItem });
                   setIsViewEditModalOpen(true);
                 }}
               >
@@ -299,7 +295,6 @@ const DataTable: React.FC<DataTableProps> = memo(({ columns, fetchData }) => {
         <UpdateModal
           setIsViewEditModalOpen={setIsViewEditModalOpen}
           selectedRecord={selectedRecord}
-          entityType="Promotion"
         />
       )}
 

@@ -73,13 +73,23 @@ export interface GetParks {
 
 export type SortOrder = "asc" | "desc" | null;
 
-export type EntityType = "Promotion" | "Park" | "Form";
+export type EntityType = "Promotions" | "Parks" | "Forms";
 
-export interface Field<T> {
-  key: keyof T | string;
-  label: string;
-  format?: (value: any) => string;
-}
+export type EntityRecord = Park | Form | Promotion;
+
+export type EntityWithStatus =
+  | (Park & { entityType: "Parks"; })
+  | (Form & { entityType: "Forms"; })
+  | (Promotion & { entityType: "Promotions"; });
+
+
+  export interface Field<T> {
+    key: keyof T; // Теперь key — это ключ конкретного объекта (Park, Form, Promotion)
+    label: string;
+    format?: (value: any) => string;
+  }
+  
+
 
 export interface Notification {
   id: string;

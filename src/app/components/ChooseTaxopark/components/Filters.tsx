@@ -62,14 +62,13 @@ const Filters: React.FC<FiltersProps> = memo(
           `${API_URL}/parks?page=1&limit=1000&cityId=${selectedCityId}&parkPromotions=${parkPromotions}`
         );
         const result: GetParks = await response.json();
-        const updatedParks = result.parks.map((park) => {
+        const updatedParks = result.data.map((park) => {
           return {
             ...park,
             approximateIncome:
               workDays * orderPerDay * Number(park.averageCheck) -
               (yandexCommission + Number(park.parkCommission)) *
                 ((workDays * orderPerDay * Number(park.averageCheck)) / 100),
-            // (yandexCommission + park.parkCommission)
           };
         });
         setFilteredItems(updatedParks);

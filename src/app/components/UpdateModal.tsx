@@ -1,60 +1,50 @@
 import { memo, useState } from "react";
 import {
-  EntityType,
+  EntityWithStatus,
   Field,
-  Form,
-  Park,
-  Promotion,
 } from "../interfaces/interfaces";
 
 interface UpdateFormProps<T> {
   setIsViewEditModalOpen: React.Dispatch<React.SetStateAction<boolean>>;
   selectedRecord: T;
-  entityType: EntityType;
-  format: any;
 }
 
-const getNestedValue = (
-  obj: Record<string, any>,
-  path: string | string[]
-): any => {
-  if (typeof path === "string") return obj[path];
-  return path.reduce(
-    (acc, key) => (acc && acc[key] !== undefined ? acc[key] : null),
-    obj
-  );
-};
-
-const entityFields = {
-  Park: [
+const entityFields: {
+  [K in EntityWithStatus["entityType"]]: Field<
+    Extract<EntityWithStatus, { entityType: K }>
+  >[];
+} = {
+  Parks: [
     { key: "title", label: "Имя" },
-    { key: "parkId", label: "Парк" },
-    { key: "description", label: "Описание" },
+    { key: "active", label: "Активный" },
+    { key: "accountantSupport", label: "Поддержка бухгатерии" },
+    { key: "averageCheck", label: "Средний чек" },
+    { key: "commissionWithdraw", label: "Комиссия снятия" },
+    { key: "entrepreneurSupport", label: "Поддержка ИП" },
+    { key: "parkPromotions", label: "Акции" },
+    { key: "yandexGasStation", label: "Яндекс.Заправки" },
   ],
-  Form: [
-    { key: "name", label: "Имя водителя" },
-    { key: "licenseNumber", label: "Номер лицензии" },
-    { key: "experience", label: "Стаж (лет)" },
+  Forms: [
+    { key: "name", label: "ФИО" },
+    { key: "Park", label: "Парк" },
+    { key: "phoneNumber", label: "Номер телефона" },
   ],
-  Promotion: [
-    { key: "model", label: "Модель автомобиля" },
-    { key: "licensePlate", label: "Госномер" },
-    { key: "year", label: "Год выпуска" },
+  Promotions: [
+    { key: "park", label: "Таксопарк" },
+    { key: "title", label: "Название" },
+    { key: "expires", label: "Активно до" },
+    { key: "createdAt", label: "Создано" },
   ],
 };
 
 const UpdateModal = memo(
-  <T extends Promotion | Form | Park>({
+  <T extends EntityWithStatus>({
     setIsViewEditModalOpen,
     selectedRecord,
-    entityType,
   }: UpdateFormProps<T>) => {
-    console.log("selectedRecord: ", selectedRecord);
-    const fields = entityFields[entityType] as Field<T>[];
-
-    console.log("fields: ", fields);
-
+    const fields = entityFields[selectedRecord.entityType] as Field<T>[];
     const [isEditMode, setIsEditMode] = useState(false);
+    
     return (
       <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
         <div className="bg-white rounded-lg shadow-lg w-[33vw] p-6">
@@ -62,16 +52,17 @@ const UpdateModal = memo(
           <div className="space-y-4">
             <div className="grid grid-cols-1 gap-4">
               {fields.map((field) => {
-                const value = getNestedValue(
-                  selectedRecord as Record<string, any>,
-                  field.key
-                );
-                const displayValue = field.format
-                  ? field.format(value)
-                  : value ?? "Нет данных";
+                const keyAsString = field.key as keyof T;
+                const value = selectedRecord[keyAsString];
+                const displayValue =
+                  field.format && value !== undefined
+                    ? field.format(value)
+                    : value !== undefined && value !== null
+                      ? String(value) // Приведение к строке
+                      : "Нет данных";
 
                 return (
-                  <div key={String(field.key)} className="w-full">
+                  <div key={String(keyAsString)} className="w-full">
                     <label className="block text-sm font-medium mb-1">
                       {field.label}
                     </label>
@@ -90,7 +81,7 @@ const UpdateModal = memo(
                 <>
                   <button
                     className="bg-green-400 text-white px-4 py-2 rounded hover:bg-green-500 transition duration-200"
-                    // onClick={updatePark}
+                  // onClick={updatePark}
                   >
                     Сохранить
                   </button>
@@ -118,17 +109,17 @@ const UpdateModal = memo(
                     >
                       Редактировать
                     </button>
-                    {selectedRecord.active ? (
+                    {selectedRecord.entityType !== "Forms" && selectedRecord.active ? (
                       <button
                         className="bg-red-500 text-white px-2 py-1 rounded hover:bg-red-600 transition duration-200"
-                        // onClick={changeStatus}
+                      // onClick={changeStatus}
                       >
                         Архивировать
                       </button>
                     ) : (
                       <button
                         className="bg-green-500 text-white px-2 py-1 rounded hover:bg-green-600 transition duration-200"
-                        // onClick={changeStatus}
+                      // onClick={changeStatus}
                       >
                         Активировать
                       </button>
