@@ -6,6 +6,7 @@ import { NotificationProvider } from "../context/NotificationContext";
 import TaxiParkTable from "../components/Parks/Parks";
 import FormTable from "../components/Forms/Forms";
 import Promotions from "../components/Promotions/Promotions";
+import PromotionsTable from "../components/PromotionsTable/PromotionsTable";
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL;
 
@@ -75,7 +76,7 @@ const AdminLayout = () => {
               : selectedItem.entityType === "Forms" ?
                 <FormTable />
                 : selectedItem.entityType === "Promotions" ?
-                  <Promotions parks={parks} /> : null
+                  <PromotionsTable parks={parks} /> : null
           }
         </main>
       </div>
