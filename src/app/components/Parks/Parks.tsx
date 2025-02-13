@@ -16,6 +16,7 @@ import NotificationBar from "../NotificationBar/NotificationBar";
 import SaveExcelButton from "../SaveExcelButton/SaveExcelButton";
 import { debounce } from "@/app/common/common";
 import ModalDropdown from "./component/Dropdown";
+import Dropdown from "./component/Dropdown";
 
 interface TaxiParkTableProps {
   cities: any[];
@@ -219,7 +220,7 @@ const TaxiParkTable: React.FC<TaxiParkTableProps> = memo(({ cities }) => {
               </th>
               <th className="border border-gray-300 px-4 py-2">
                 <div>Яндекс заправки</div>
-                <ModalDropdown
+                <Dropdown
                   label=""
                   onChange={(value) => {
                     if (value !== undefined) {

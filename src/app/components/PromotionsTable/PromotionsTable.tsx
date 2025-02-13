@@ -4,7 +4,7 @@ import React, { memo, useCallback, useEffect, useState } from "react";
 import { BiSortAlt2 } from "react-icons/bi";
 import { GoSortAsc, GoSortDesc } from "react-icons/go";
 import { debounce } from "@/app/common/common";
-import CreatePromotion from "@/app/components/PromotionsTable/component/CreatePromotion";
+import CreatePromotion from "@/app/components/Promotions/component/CreatePromotion";
 import NotificationBar from "@/app/components/NotificationBar/NotificationBar";
 import { Notification, Park } from "@/app/interfaces/interfaces";
 import SaveExcelButton from "../SaveExcelButton/SaveExcelButton";
@@ -71,8 +71,8 @@ const PromotionsTable: React.FC<PromotionsTableProps> = memo(({ parks }) => {
           ? prevConfig.order === "asc"
             ? "desc"
             : prevConfig.order === "desc"
-            ? null
-            : "asc"
+              ? null
+              : "asc"
           : "asc";
 
       return { key, order: newOrder };
@@ -185,10 +185,10 @@ const PromotionsTable: React.FC<PromotionsTableProps> = memo(({ parks }) => {
                 <td className="border border-gray-300 px-4 py-2 text-center">
                   {item.expires
                     ? new Date(item.expires).toLocaleString("ru-RU", {
-                        year: "numeric",
-                        month: "long",
-                        day: "numeric",
-                      })
+                      year: "numeric",
+                      month: "long",
+                      day: "numeric",
+                    })
                     : "Без срока"}
                 </td>
                 <td className="border border-gray-300 px-4 py-2 text-center">
@@ -205,13 +205,13 @@ const PromotionsTable: React.FC<PromotionsTableProps> = memo(({ parks }) => {
                 <td className="border border-gray-300 px-4 py-2 text-center">
                   {item.createdAt
                     ? new Date(item.createdAt).toLocaleString("ru-RU", {
-                        year: "numeric",
-                        month: "long",
-                        day: "numeric",
-                        hour: "2-digit",
-                        minute: "2-digit",
-                        second: "2-digit",
-                      })
+                      year: "numeric",
+                      month: "long",
+                      day: "numeric",
+                      hour: "2-digit",
+                      minute: "2-digit",
+                      second: "2-digit",
+                    })
                     : ""}
                 </td>
               </tr>
@@ -267,7 +267,7 @@ const PromotionsTable: React.FC<PromotionsTableProps> = memo(({ parks }) => {
         />
       )}
 
-      <NotificationBar notifications={notifications} />
+      <NotificationBar />
     </div>
   );
 });

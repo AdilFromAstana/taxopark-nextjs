@@ -36,6 +36,12 @@ const formTypeObj = {
 };
 
 const excelHeaders = {
+  promotions: [
+    { header: "Название", key: "title", width: 50 },
+    { header: "Таксопарк", key: "park", width: 50 },
+    { header: "Активно до", key: "expierAt", width: 50 },
+    { header: "Дата создания", key: "createdAt", width: 50 },
+  ],
   forms: [
     { header: "ФИО", key: "name", width: 50 },
     { header: "Номер телефона", key: "phoneNumber", width: 50 },

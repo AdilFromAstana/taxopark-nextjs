@@ -75,7 +75,7 @@ const AdminLayout = () => {
               : selectedItem.entityType === "Forms" ?
                 <FormTable />
                 : selectedItem.entityType === "Promotions" ?
-                  <Promotions /> : null
+                  <Promotions parks={parks} /> : null
           }
         </main>
       </div>

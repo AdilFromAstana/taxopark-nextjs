@@ -35,7 +35,8 @@ export interface Promotion {
   startDate: string;
   expires: string | null;
   active: boolean;
-  park: {
+  parkId: string;
+  Park: {
     title: string;
     id: string;
   };
@@ -66,6 +67,12 @@ export interface ApiError {
 
 export interface GetParks {
   data: Park[];
+  total: number;
+  page: number;
+  totalPages: number;
+}
+export interface GetPromotions {
+  data: Promotion[];
   total: number;
   page: number;
   totalPages: number;
@@ -124,5 +131,5 @@ export interface GetFormsParams {
 
 export interface SaveExcelButtonProps {
   url: string;
-  dataType: "parks" | "forms";
+  dataType: "parks" | "forms" | "promotions";
 }

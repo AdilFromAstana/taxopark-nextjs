@@ -1,9 +1,8 @@
-import { Notification, Park } from "@/app/interfaces/interfaces";
+import { Park } from "@/app/interfaces/interfaces";
 import axios from "axios";
 import React, { memo, useState } from "react";
 import ModalDropdown from "./Dropdown";
 import MultiSelect from "./MultiSelect";
-// import StarRating from "./StarRating";
 import TextInput from "./TextInput";
 import { useNotifications } from "@/app/context/NotificationContext";
 

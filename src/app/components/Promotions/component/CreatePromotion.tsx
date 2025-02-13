@@ -1,18 +1,21 @@
 import React, { memo, useState } from "react";
 import axios from "axios";
 import TextInput from "../../Parks/component/TextInput";
+import { useNotifications } from "@/app/context/NotificationContext";
+import { Promotion } from "@/app/interfaces/interfaces";
+import SearchableDropdown from "../../SearchableDropdown";
 
 interface CreatePromotionProps {
   setIsCreateModalOpen: React.Dispatch<React.SetStateAction<boolean>>;
   parks: any[];
-  setPromotions: React.Dispatch<React.SetStateAction<any[]>>;
-  setNotifications: React.Dispatch<React.SetStateAction<any[]>>;
+  setPromotions: React.Dispatch<React.SetStateAction<Promotion[]>>;
 }
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL;
 
 const CreatePromotion: React.FC<CreatePromotionProps> = memo(
-  ({ setIsCreateModalOpen, parks, setPromotions, setNotifications }) => {
+  ({ setIsCreateModalOpen, parks, setPromotions }) => {
+    const { addNotification } = useNotifications()
     const [newPromotion, setNewPromotion] = useState({
       title: "",
       description: "",
@@ -23,18 +26,6 @@ const CreatePromotion: React.FC<CreatePromotionProps> = memo(
     });
 
     const [isLoading, setIsLoading] = useState(false);
-
-    const addNotification = (notification: {
-      type: string;
-      message: string;
-    }) => {
-      const id = Math.random().toString(36).substr(2, 9);
-      setNotifications((prev) => [...prev, { ...notification, id }]);
-
-      setTimeout(() => {
-        setNotifications((prev) => prev.filter((n) => n.id !== id));
-      }, 5000);
-    };
 
     const createPromotion = async () => {
       try {
@@ -91,25 +82,11 @@ const CreatePromotion: React.FC<CreatePromotionProps> = memo(
               <label className="block text-sm font-medium mb-1">
                 Таксопарк
               </label>
-              <select
-                className="w-full border border-gray-300 rounded-lg p-2"
+              <SearchableDropdown
                 value={newPromotion.parkId}
-                onChange={(e) =>
-                  setNewPromotion({
-                    ...newPromotion,
-                    parkId: e.target.value,
-                  })
-                }
-              >
-                <option value="" disabled>
-                  Выберите таксопарк
-                </option>
-                {parks.map((park) => (
-                  <option key={park.id} value={park.id}>
-                    {park.title}
-                  </option>
-                ))}
-              </select>
+                onChange={(value) => setNewPromotion({ ...newPromotion, parkId: value })}
+                apiUrl={`${API_URL}/parks/getByName`}
+              />
             </div>
             <TextInput
               value={newPromotion.description}
