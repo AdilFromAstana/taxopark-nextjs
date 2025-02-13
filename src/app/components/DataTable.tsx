@@ -6,10 +6,12 @@ import { GoSortAsc, GoSortDesc } from "react-icons/go";
 import { debounce } from "@/app/common/common";
 import MultiSelect from "./Parks/component/MultiSelect";
 import UpdateModal from "./UpdateModal";
-import { EntityType, EntityWithStatus } from "../interfaces/interfaces";
+import { City, EntityType, EntityWithStatus, GetParks, Park } from "../interfaces/interfaces";
+import CreateModal from "./CreateModal";
+import NotificationBar from "./NotificationBar/NotificationBar";
 
-interface ColumnConfig {
-  key: string | string[];
+interface ColumnConfig<T> {
+  key: string;
   label: string;
   render?: (value: any, record: any) => React.ReactNode;
   sortable?: boolean;
@@ -26,30 +28,56 @@ interface FetchParams {
 }
 
 interface DataTableProps {
-  columns: ColumnConfig[];
-  fetchData: (params: FetchParams) => Promise<{ data: any[]; total: number }>;
-  selectedItem: EntityType
+  fetchData: (params: FetchParams) => Promise<{ data: any[]; total: number, totalPages: number }>;
+  selectedItem: { label: string; entityType: EntityType }
 }
 
-const getNestedValue = (
-  obj: Record<string, any>,
-  path: string | string[]
-): any => {
-  if (typeof path === "string") return obj[path];
-  return path.reduce(
-    (acc, key) => (acc && acc[key] !== undefined ? acc[key] : null),
-    obj
-  );
+const getNestedValue = (obj: any, path: string) => {
+  return path.split('.').reduce((acc, key) => acc && acc[key] ? acc[key] : null, obj);
 };
 
-const DataTable: React.FC<DataTableProps> = memo(({ columns, fetchData, selectedItem }) => {
+const entityFields: {
+  [K in EntityWithStatus["entityType"]]: ColumnConfig<
+    Extract<EntityWithStatus, { entityType: K }>
+  >[];
+} = {
+  Parks: [
+    { key: "title", label: "Имя" },
+    { key: "Сity.title", label: "Город" },
+    { key: "active", label: "Активный" },
+    { key: "accountantSupport", label: "Поддержка бухгатерии" },
+    { key: "averageCheck", label: "Средний чек" },
+    { key: "commissionWithdraw", label: "Комиссия снятия" },
+    { key: "entrepreneurSupport", label: "Поддержка ИП" },
+    { key: "parkPromotions", label: "Акции" },
+    { key: "yandexGasStation", label: "Яндекс.Заправки" },
+  ],
+  Forms: [
+    { key: "name", label: "ФИО" },
+    { key: "parkId", label: "Парк" },
+    { key: "phoneNumber", label: "Номер телефона" },
+  ],
+  Promotions: [
+    { key: "park", label: "Таксопарк" },
+    { key: "title", label: "Название" },
+    { key: "expires", label: "Активно до" },
+    { key: "createdAt", label: "Создано" },
+  ],
+};
+
+const API_URL = process.env.NEXT_PUBLIC_API_URL;
+
+const DataTable: React.FC<DataTableProps> = memo(({ fetchData, selectedItem }) => {
   const [data, setData] = useState<any[]>([]);
+  const [cities, setCities] = useState<City[]>([]);
+  const [parks, setParks] = useState<Park[]>([]);
   const [isViewEditModalOpen, setIsViewEditModalOpen] = useState<boolean>(false);
   const [isCreateModalOpen, setIsCreateModalOpen] = useState<boolean>(false);
   const [selectedRecord, setSelectedRecord] = useState<
     EntityWithStatus
   >();
   const [totalRecords, setTotalRecords] = useState<number>(0);
+  const [totalPages, setTotalPages] = useState<number>(0);
   const [currentPage, setCurrentPage] = useState<number>(1);
   const [limit, setLimit] = useState<number>(10);
   const [isLoading, setIsLoading] = useState<boolean>(true);
@@ -59,13 +87,36 @@ const DataTable: React.FC<DataTableProps> = memo(({ columns, fetchData, selected
     order: null,
   });
 
+  const getParks = async () => {
+    try {
+      const response = await fetch(`${API_URL}/parks?page=1&limit=1000`);
+      const result: GetParks = await response.json();
+
+      setParks(result.data);
+    } catch (error) {
+      console.error("Ошибка при загрузке данных: ", error);
+    }
+  };
+
+  const getCities = async () => {
+    try {
+      const response = await fetch(`${API_URL}/cities`);
+      const result: City[] = await response.json();
+
+      setCities(result);
+    } catch (e) {
+      console.error(e);
+    }
+  };
+
   const debouncedFetchData = useCallback(
     debounce(async (params: FetchParams) => {
       setIsLoading(true);
       try {
-        const { data, total } = await fetchData(params);
+        const { data, total, totalPages } = await fetchData(params);
         setData(data);
         setTotalRecords(total);
+        setTotalPages(totalPages);
       } catch (error) {
         console.error("Ошибка загрузки данных:", error);
       } finally {
@@ -107,17 +158,25 @@ const DataTable: React.FC<DataTableProps> = memo(({ columns, fetchData, selected
     });
   };
 
+  useEffect(() => {
+    getParks()
+    getCities()
+  }, [])
+
   return (
     <div className="p-4 h-full flex flex-col gap-4">
       <div className="flex justify-between items-center">
         <div className="flex items-center gap-2">
-          <h1 className="text-2xl font-bold">Данные</h1>
-          <button
-            className="bg-blue-500 text-white px-2 rounded hover:bg-blue-600 transition duration-200 text-xl"
-            onClick={() => setIsCreateModalOpen(true)}
-          >
-            +
-          </button>
+          <h1 className="text-2xl font-bold">{selectedItem.label}</h1>
+          {
+            selectedItem.entityType !== "Forms" &&
+            <button
+              className="bg-blue-500 text-white px-2 rounded hover:bg-blue-600 transition duration-200 text-xl"
+              onClick={() => setIsCreateModalOpen(true)}
+            >
+              +
+            </button>
+          }
         </div>
       </div>
 
@@ -131,7 +190,7 @@ const DataTable: React.FC<DataTableProps> = memo(({ columns, fetchData, selected
           <thead className="bg-gray-100">
             <tr>
               <th className="border border-gray-300 px-4 py-2 w-10">#</th>
-              {columns.map((col) => (
+              {entityFields[selectedItem.entityType].map((col) => (
                 <th
                   key={Array.isArray(col.key) ? col.key.join(".") : col.key}
                   className="border border-gray-300 px-4 py-2"
@@ -227,18 +286,20 @@ const DataTable: React.FC<DataTableProps> = memo(({ columns, fetchData, selected
                 key={item.id}
                 className="hover:bg-gray-50"
                 onClick={() => {
-                  setSelectedRecord({ ...item, entityType: selectedItem });
+                  setSelectedRecord({ ...item, entityType: selectedItem.entityType });
                   setIsViewEditModalOpen(true);
                 }}
               >
                 <td className="border border-gray-300 px-4 py-2 text-center">
                   {(currentPage - 1) * limit + i + 1}
                 </td>
-                {columns.map((col) => {
+                {entityFields[selectedItem.entityType].map((col) => {
                   const value = getNestedValue(item, col.key);
+                  if (col.key === "Сity.title")
+                    console.log("value: ", value)
                   return (
                     <td
-                      key={Array.isArray(col.key) ? col.key.join(".") : col.key}
+                      key={col.key}
                       className="border border-gray-300 px-4 py-2"
                     >
                       {col.render ? col.render(value, item) : value ?? "—"}
@@ -293,12 +354,22 @@ const DataTable: React.FC<DataTableProps> = memo(({ columns, fetchData, selected
 
       {isViewEditModalOpen && selectedRecord && (
         <UpdateModal
+          cities={cities}
+          parks={parks}
           setIsViewEditModalOpen={setIsViewEditModalOpen}
           selectedRecord={selectedRecord}
         />
       )}
 
-      {isCreateModalOpen && <div></div>}
+      {isCreateModalOpen && <CreateModal
+        cities={cities}
+        parks={parks}
+        setData={setData}
+        entityType={selectedItem.entityType}
+        setIsCreateModalOpen={setIsCreateModalOpen}
+      />}
+
+      <NotificationBar />
     </div>
   );
 });

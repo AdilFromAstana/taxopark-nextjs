@@ -1,36 +1,23 @@
 import { Notification, Park } from "@/app/interfaces/interfaces";
 import axios from "axios";
 import React, { memo, useState } from "react";
-import ModalDropdown from "./ModalDropdown";
+import ModalDropdown from "./Dropdown";
 import MultiSelect from "./MultiSelect";
 // import StarRating from "./StarRating";
 import TextInput from "./TextInput";
+import { useNotifications } from "@/app/context/NotificationContext";
 
 interface CreateParkProps {
   setIsCreateModalOpen: React.Dispatch<React.SetStateAction<boolean>>;
   cities: any[];
   setParks: React.Dispatch<React.SetStateAction<Park[]>>;
-  setNotifications: React.Dispatch<React.SetStateAction<Notification[]>>;
 }
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL;
 
 const CreatePark: React.FC<CreateParkProps> = memo(
-  ({ setIsCreateModalOpen, cities, setParks, setNotifications }) => {
-    const addNotification = (notification: Omit<Notification, "id">) => {
-      const id = Math.random().toString(36).substr(2, 9);
-
-      setNotifications((prev) => {
-        return [...prev, { ...notification, id }];
-      });
-
-      setTimeout(() => {
-        setNotifications((prev) =>
-          prev.filter((n: Notification) => n.id !== id)
-        );
-      }, 5000);
-    };
-
+  ({ setIsCreateModalOpen, cities, setParks }) => {
+    const { addNotification } = useNotifications();
     const [newRecord, setNewRecord] = useState<
       Omit<Park, "id" | "active" | "City" | "createdAt" | "updatedAt">
     >({

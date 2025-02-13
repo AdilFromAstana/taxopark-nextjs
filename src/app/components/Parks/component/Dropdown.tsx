@@ -7,7 +7,7 @@ interface DropdownProps {
   disabled?: boolean;
 }
 
-const ModalDropdown: React.FC<DropdownProps> = ({
+const Dropdown: React.FC<DropdownProps> = ({
   label,
   value,
   onChange,
@@ -42,4 +42,4 @@ const ModalDropdown: React.FC<DropdownProps> = ({
   );
 };
 
-export default ModalDropdown;
+export default Dropdown;

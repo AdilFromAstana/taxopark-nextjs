@@ -22,7 +22,6 @@ const ChooseTaxopark = memo(() => {
       setCities(response.data);
     } catch (e) {
       console.error(e);
-    } finally {
     }
   };
 

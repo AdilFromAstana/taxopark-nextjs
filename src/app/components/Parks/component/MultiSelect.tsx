@@ -34,6 +34,11 @@ const MultiSelect = <T,>({
   };
 
   const renderSelectedItems = () => {
+    if (!Array.isArray(values)) {
+      console.error("values is not an array:", values);
+      return null;
+    }
+
     if (values.length <= 2) {
       return values.map((value) => (
         <div
@@ -57,7 +62,7 @@ const MultiSelect = <T,>({
       ));
     } else {
       const visibleValues = values.slice(0, 2);
-      const remainingCount = values.length - 1;
+      const remainingCount = values.length - 2; // исправлено с `values.length - 1`
 
       return (
         <>
@@ -88,6 +93,7 @@ const MultiSelect = <T,>({
       );
     }
   };
+
 
   return (
     <div className="relative w-full">

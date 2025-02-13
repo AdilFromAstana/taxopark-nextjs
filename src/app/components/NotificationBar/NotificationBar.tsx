@@ -1,3 +1,5 @@
+import { useNotifications } from "@/app/context/NotificationContext";
+import { useNotification } from "@/app/hooks/useNotification";
 import React, { useEffect, useState } from "react";
 
 interface Notification {
@@ -6,11 +8,10 @@ interface Notification {
     message: string; // Текст сообщения
 }
 
-interface NotificationBarProps {
-    notifications: Notification[];
-}
+const NotificationBar: React.FC = () => {
 
-const NotificationBar: React.FC<NotificationBarProps> = ({ notifications }) => {
+    const { notifications } = useNotifications()
+
     return (
         <div className="fixed top-4 right-4 space-y-4 z-50">
             {notifications.map((notification) => (

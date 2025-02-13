@@ -1,12 +1,16 @@
 import { memo, useState } from "react";
 import {
+  City,
   EntityWithStatus,
   Field,
+  Park,
 } from "../interfaces/interfaces";
 
 interface UpdateFormProps<T> {
   setIsViewEditModalOpen: React.Dispatch<React.SetStateAction<boolean>>;
   selectedRecord: T;
+  cities: City[];
+  parks: Park[]
 }
 
 const entityFields: {
@@ -15,25 +19,24 @@ const entityFields: {
   >[];
 } = {
   Parks: [
-    { key: "title", label: "Имя" },
-    { key: "active", label: "Активный" },
-    { key: "accountantSupport", label: "Поддержка бухгатерии" },
-    { key: "averageCheck", label: "Средний чек" },
-    { key: "commissionWithdraw", label: "Комиссия снятия" },
-    { key: "entrepreneurSupport", label: "Поддержка ИП" },
-    { key: "parkPromotions", label: "Акции" },
-    { key: "yandexGasStation", label: "Яндекс.Заправки" },
-  ],
-  Forms: [
-    { key: "name", label: "ФИО" },
-    { key: "Park", label: "Парк" },
-    { key: "phoneNumber", label: "Номер телефона" },
+    { key: "title", label: "Имя", dataType: "text" },
+    { key: "cityId", label: "Город", dataType: "select", optionsType: "cities" },
+    { key: "accountantSupport", label: "Поддержка бухгалтерии", dataType: "select", optionsType: "booleans" },
+    { key: "averageCheck", label: "Средний чек", dataType: "text" },
+    { key: "commissionWithdraw", label: "Комиссия снятия", dataType: "text" },
+    { key: "entrepreneurSupport", label: "Поддержка ИП", dataType: "select", optionsType: "booleans" },
+    { key: "parkPromotions", label: "Акции", dataType: "multiSelect" },
+    { key: "yandexGasStation", label: "Яндекс.Заправки", dataType: "select", optionsType: "booleans" },
   ],
   Promotions: [
-    { key: "park", label: "Таксопарк" },
-    { key: "title", label: "Название" },
-    { key: "expires", label: "Активно до" },
-    { key: "createdAt", label: "Создано" },
+    { key: "park.id", label: "Таксопарк", dataType: "select", optionsType: "parks" },
+    { key: "title", label: "Название", dataType: "text" },
+    { key: "expires", label: "Активно до", dataType: "dateRange" },
+  ],
+  Forms: [
+    { key: "name", label: "ФИО", dataType: "text", },
+    { key: "parkId", label: "Парк", dataType: "select", optionsType: "parks" },
+    { key: "phoneNumber", label: "Номер телефона", dataType: "text", },
   ],
 };
 
@@ -44,10 +47,10 @@ const UpdateModal = memo(
   }: UpdateFormProps<T>) => {
     const fields = entityFields[selectedRecord.entityType] as Field<T>[];
     const [isEditMode, setIsEditMode] = useState(false);
-    
+
     return (
       <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-        <div className="bg-white rounded-lg shadow-lg w-[33vw] p-6">
+        <div className="bg-white rounded-lg shadow-lg w-[75vw] p-6">
           <h2 className="text-xl font-bold mb-4">Просмотр записи</h2>
           <div className="space-y-4">
             <div className="grid grid-cols-1 gap-4">

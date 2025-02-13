@@ -12,7 +12,7 @@ export const fetchDataAPI = async <T,>({
   limit = 10,
   sort = { key: null, order: null },
   filters = {},
-}: FetchDataParams): Promise<{ data: T[]; total: number }> => {
+}: FetchDataParams): Promise<{ data: T[]; total: number; totalPages: number; }> => {
   try {
     const params = new URLSearchParams();
     params.append("page", page.toString());
@@ -33,18 +33,17 @@ export const fetchDataAPI = async <T,>({
     });
 
     const response = await fetch(`${apiEndpoint}?${params.toString()}`);
-    console.log("apiEndpoint: ", apiEndpoint);
-    console.log("result: ", response);
     if (!response.ok) throw new Error("Ошибка загрузки данных");
 
     const result = await response.json();
 
     return {
-      data: result.data || result.items || result.forms || [],
-      total: result.totalPages || result.total || 0,
+      data: result.data || [],
+      totalPages: result.totalPages || 0,
+      total: result.total || 0,
     };
   } catch (error) {
     console.error("Ошибка при загрузке данных:", error);
-    return { data: [], total: 0 };
+    return { data: [], total: 0, totalPages: 0 };
   }
 };

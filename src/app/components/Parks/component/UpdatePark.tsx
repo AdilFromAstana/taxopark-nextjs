@@ -1,9 +1,11 @@
 import { Notification, Park } from "@/app/interfaces/interfaces";
 import { memo, useState } from "react";
-import ModalDropdown from "./ModalDropdown";
+import ModalDropdown from "./Dropdown";
 import MultiSelect from "./MultiSelect";
 import TextInput from "./TextInput";
 import axios from "axios";
+import Dropdown from "./Dropdown";
+import { useNotifications } from "@/app/context/NotificationContext";
 
 interface UpdateParkProps {
   setIsViewEditModalOpen: React.Dispatch<React.SetStateAction<boolean>>;
@@ -14,7 +16,6 @@ interface UpdateParkProps {
   parks: Park[];
   cities: any[];
   setParks: React.Dispatch<React.SetStateAction<Park[]>>;
-  setNotifications: React.Dispatch<React.SetStateAction<Notification[]>>;
 }
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL;
@@ -29,26 +30,11 @@ const UpdatePark: React.FC<UpdateParkProps> = memo(
     parks,
     cities = [],
     setParks,
-    setNotifications,
   }) => {
     const [startTime, setStartTime] = useState("");
     const [endTime, setEndTime] = useState("");
-
+    const { addNotification } = useNotifications();
     const [isLoading, setIsLoading] = useState(false);
-
-    const addNotification = (notification: Omit<Notification, "id">) => {
-      const id = Math.random().toString(36).substr(2, 9);
-
-      setNotifications((prev) => {
-        return [...prev, { ...notification, id }];
-      });
-
-      setTimeout(() => {
-        setNotifications((prev) =>
-          prev.filter((n: Notification) => n.id !== id)
-        );
-      }, 5000);
-    };
 
     const handleStartTime = (event: React.ChangeEvent<HTMLInputElement>) => {
       let value = event.target.value;
@@ -111,9 +97,8 @@ const UpdatePark: React.FC<UpdateParkProps> = memo(
         });
         addNotification({
           type: "success",
-          message: `Таксопарк ${
-            updatedPark.active ? "активирован" : "архивирован"
-          }!`,
+          message: `Таксопарк ${updatedPark.active ? "активирован" : "архивирован"
+            }!`,
         });
       } catch (error: any) {
         console.error("Ошибка при обновлении парка:", error);
@@ -212,7 +197,7 @@ const UpdatePark: React.FC<UpdateParkProps> = memo(
                   ))}
                 </select>
               </div>
-              <ModalDropdown
+              <Dropdown
                 label="Поддержка ИП водителей"
                 value={selectedRecord.entrepreneurSupport}
                 onChange={(value) =>
@@ -223,7 +208,7 @@ const UpdatePark: React.FC<UpdateParkProps> = memo(
                 }
                 disabled={!isEditMode}
               />
-              <ModalDropdown
+              <Dropdown
                 label="Поддержка паркового ИП"
                 value={selectedRecord.parkEntrepreneurSupport}
                 onChange={(value) =>

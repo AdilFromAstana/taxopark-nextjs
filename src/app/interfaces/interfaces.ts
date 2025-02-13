@@ -83,13 +83,13 @@ export type EntityWithStatus =
   | (Promotion & { entityType: "Promotions"; });
 
 
-  export interface Field<T> {
-    key: keyof T; // Теперь key — это ключ конкретного объекта (Park, Form, Promotion)
-    label: string;
-    format?: (value: any) => string;
-  }
-  
-
+export interface Field<T> {
+  key: keyof T | string; // Теперь key поддерживает строки вида "park.id"
+  label: string;
+  dataType: "text" | "dateRange" | "multiSelect" | "select";
+  optionsType?: "parks" | "cities" | "booleans";
+  format?: (value: any) => string;
+}
 
 export interface Notification {
   id: string;
@@ -103,6 +103,13 @@ export interface FormTableProps {
 
 export interface GetForms {
   data: Form[];
+  total: number;
+  page: number;
+  totalPages: number;
+}
+
+export interface GetCities {
+  data: City[];
   total: number;
   page: number;
   totalPages: number;

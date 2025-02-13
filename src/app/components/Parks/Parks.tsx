@@ -15,7 +15,7 @@ import { GoSortAsc, GoSortDesc } from "react-icons/go";
 import NotificationBar from "../NotificationBar/NotificationBar";
 import SaveExcelButton from "../SaveExcelButton/SaveExcelButton";
 import { debounce } from "@/app/common/common";
-import ModalDropdown from "./component/ModalDropdown";
+import ModalDropdown from "./component/Dropdown";
 
 interface TaxiParkTableProps {
   cities: any[];
@@ -24,7 +24,6 @@ interface TaxiParkTableProps {
 const API_URL = process.env.NEXT_PUBLIC_API_URL;
 
 const TaxiParkTable: React.FC<TaxiParkTableProps> = memo(({ cities }) => {
-  const [notifications, setNotifications] = useState<Notification[]>([]);
   const [isCreateModalOpen, setIsCreateModalOpen] = useState<boolean>(false);
   const [selectedRecord, setSelectedRecord] = useState<Park | null>(null);
   const [totalRecords, setTotalRecords] = useState<number>(0);
@@ -82,8 +81,8 @@ const TaxiParkTable: React.FC<TaxiParkTableProps> = memo(({ cities }) => {
           ? prevConfig.order === "asc"
             ? "desc"
             : prevConfig.order === "desc"
-            ? null
-            : "asc"
+              ? null
+              : "asc"
           : "asc";
 
       return { key, order: newOrder };
@@ -311,7 +310,6 @@ const TaxiParkTable: React.FC<TaxiParkTableProps> = memo(({ cities }) => {
 
       {isCreateModalOpen && (
         <CreatePark
-          setNotifications={setNotifications}
           setParks={setParks}
           setIsCreateModalOpen={setIsCreateModalOpen}
           cities={cities}
@@ -320,7 +318,6 @@ const TaxiParkTable: React.FC<TaxiParkTableProps> = memo(({ cities }) => {
 
       {isViewEditModalOpen && selectedRecord && (
         <UpdatePark
-          setNotifications={setNotifications}
           cities={cities}
           setIsViewEditModalOpen={setIsViewEditModalOpen}
           isEditMode={isEditMode}
@@ -332,7 +329,7 @@ const TaxiParkTable: React.FC<TaxiParkTableProps> = memo(({ cities }) => {
         />
       )}
 
-      <NotificationBar notifications={notifications} />
+      <NotificationBar />
     </div>
   );
 });
